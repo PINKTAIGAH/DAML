@@ -71,19 +71,39 @@ class SimulateMuonLifetime(object):
             raise Exception("The random lifetims array has not been initialised.")
         return self.randomLifetimesArray.mean()
 
-
-
-
 def test():
     N = 1000
-    simulation = SimulateMuonLifetime(2.2, N)
-    simulatedLifetimes = simulation.simulateLifetimes()
-    print(f"Simulated average muon lifetime for single simulation run is {simulation.computeEstimatedLifetime():.3f} mus")
+    muLifetimeTruth = 2.2
+    simulationLimit5 = SimulateMuonLifetime(muLifetimeTruth, N, distributionLimits=(0,5))
+    simulationLimit10 = SimulateMuonLifetime(muLifetimeTruth, N, distributionLimits=(0,10))
+    simulationLimit100 = SimulateMuonLifetime(muLifetimeTruth, N, distributionLimits=(0,100))
+    simulatedLifetimes = simulationLimit10.simulateLifetimes()
+    print(f"Simulated average muon lifetime for single simulation run is {simulationLimit10.computeEstimatedLifetime():.3f} mus")
 
     plt.hist(simulatedLifetimes, bins=100, density=True)
-    plt.plot(np.linspace(0, 10, N), simulation.exponantialTruth(np.linspace(0, 10, N), 2.2))
+    plt.plot(np.linspace(0, 10, N), simulationLimit10.exponantialTruth(np.linspace(0, 10, N), muLifetimeTruth))
     plt.show()
 
+    multipleSimulatedLifetimes10 = []
+    multipleSimulatedLifetimes100 = []
+    multipleSimulatedLifetimes5 = []
+    for _ in range(500):
+        # limit 10
+        _ = simulationLimit10.simulateLifetimes()
+        multipleSimulatedLifetimes10.append(simulationLimit10.computeEstimatedLifetime())
+    
+        # limit 100
+        _ = simulationLimit100.simulateLifetimes()
+        multipleSimulatedLifetimes100.append(simulationLimit100.computeEstimatedLifetime())
+
+        # limit 10
+        _ = simulationLimit5.simulateLifetimes()
+        multipleSimulatedLifetimes5.append(simulationLimit5.computeEstimatedLifetime())
+
+    plt.hist(multipleSimulatedLifetimes10, bins = 50)
+    plt.hist(multipleSimulatedLifetimes100, bins = 50)
+    plt.hist(multipleSimulatedLifetimes5, bins = 50)
+    plt.show()
 
 
 if __name__ == "__main__":
