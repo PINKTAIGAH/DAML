@@ -79,7 +79,7 @@ def main():
         yMax = currentYMax if (yMax < currentYMax) else yMax
 
     
-    plt.xlabel("Simulated muon lifetimes, t ($\mu s)")
+    plt.xlabel("Simulated muon lifetimes, t ($\mu s$)")
     plt.ylabel("Probability")
     plt.title("Probability distribution function of simulated muon lifetimes")
     plt.vlines(MU_LIFETIME_TRUTH, 0, yMax, colors="k", linestyles="dashed", label="True muon lifetime" )
