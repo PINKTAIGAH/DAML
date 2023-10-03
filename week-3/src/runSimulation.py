@@ -11,7 +11,7 @@ def main():
     """
     MU_LIFETIME_TRUTH = 2.2         # in microseconds
     NUM_SAMPLES = 1000
-    NUM_SIMULATIONS = 500
+    NUM_SIMULATIONS = 3000
     LIMITS_1 = (0, 10)
     LIMITS_2 = (0, 5)
     LIMITS_3 = (0, 100)
@@ -25,7 +25,7 @@ def main():
     print(f"The simulated average muon lifetime with range 0 < t < 10 is {muonSimulation.computeEstimatedLifetime():.3f} mu s")
 
     # Plot distribution of sampled lifetimes with predicted distribution
-    plt.hist(sampledMuonLifetimes, bins=100, label="Sampled distribution", density=True)
+    plt.hist(sampledMuonLifetimes, bins=100, density=True, label="Sampled distribution")
     plt.plot(TIME, muonSimulation.exponantialTruth(TIME, MU_LIFETIME_TRUTH),label="Predicted distribution") 
     plt.xlabel("Muon Lifetime, t ($\mu s$)")
     plt.ylabel("Probability")
@@ -63,6 +63,7 @@ def main():
         simulatedLifetimesLowLimits,
         simulatedLifetimesHighLimits
     ]
+
     overallLabels = [
         "limits: 0 < t < 10",
         "limits: 0 < t < 5",
