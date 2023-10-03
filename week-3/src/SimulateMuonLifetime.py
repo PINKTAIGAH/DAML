@@ -9,14 +9,13 @@ import matplotlib.pyplot as plt
 
 class SimulateMuonLifetime(object):
 
-    def __init__(self, muLifetimeTruth, numSimulations, distributionLimits=(0, 10)):
+    def __init__(self, muLifetimeTruth, distributionLimits=(0, 10)):
         #=======================================================================
         # Class constructor. Distribution limits are in units of microseconds 
     
-        # Define the inverse lifetime for easier computations
+    # Define the inverse lifetime for easier computations
         self.muLifetimeTruth = muLifetimeTruth            
         self.lowLimit, self.highLimit = distributionLimits
-        self.numSimulations = numSimulations
         self.randomLifetimesList = []
         self.randomLifetimesArray = np.array([])
 
@@ -26,7 +25,7 @@ class SimulateMuonLifetime(object):
 
         return (1/lifetime)*np.exp(-x/lifetime)
     
-    def simulateSingleRandomLifetime(self,):
+    def sampleSingleRandomLifetime(self,):
         #=======================================================================
         # Simulate the lifetime of a single muon 
         
@@ -38,7 +37,7 @@ class SimulateMuonLifetime(object):
 
         self.randomLifetimesList = []
 
-    def simulateLifetimes(self,):
+    def sampleLifetimes(self, numSamples):
         #=======================================================================
         # Return an array containing all the desired randomised muon lifetimes
 
@@ -47,12 +46,12 @@ class SimulateMuonLifetime(object):
 
         # iterate over all desired simulation points
         while True:
-            randomLifetimeCanditade = self.simulateSingleRandomLifetime()
+            randomLifetimeCanditade = self.sampleSingleRandomLifetime()
             # Check if generated muon lifetime is within the desired bounds
             if (self.lowLimit < randomLifetimeCanditade) and (randomLifetimeCanditade<self.highLimit):
                 self.randomLifetimesList.append(randomLifetimeCanditade)
             
-            if len(self.randomLifetimesList) >= self.numSimulations:
+            if len(self.randomLifetimesList) >= numSamples:
                 # Create object containing simulated lifetime of muons
                 self.randomLifetimesArray = np.array(self.randomLifetimesList)
                 # Wipe data from estimated lifetime list for a subsequent simulation
@@ -71,17 +70,35 @@ class SimulateMuonLifetime(object):
             raise Exception("The random lifetims array has not been initialised.")
         return self.randomLifetimesArray.mean()
 
+    def simulateMultipleMuonLifetimes(self, numSamples, numSimulations):
+        #=======================================================================
+        # Run full simulation chain fro specified number of simulations and return
+        # array containing results
+        
+        simulatedLifetimeList = []
+        
+        # Iterate over simulation chain for  desired events
+        for _ in range(numSimulations):
+            _ = self.sampleLifetimes(numSamples)
+            simulatedLifetimeList.append(self.computeEstimatedLifetime())
+        
+        return np.array(simulatedLifetimeList)
+
+
+
 def test():
     N = 1000
     muLifetimeTruth = 2.2
-    simulationLimit5 = SimulateMuonLifetime(muLifetimeTruth, N, distributionLimits=(0,5))
-    simulationLimit10 = SimulateMuonLifetime(muLifetimeTruth, N, distributionLimits=(0,10))
-    simulationLimit100 = SimulateMuonLifetime(muLifetimeTruth, N, distributionLimits=(0,100))
-    simulatedLifetimes = simulationLimit10.simulateLifetimes()
+    simulationLimit5 = SimulateMuonLifetime(muLifetimeTruth, distributionLimits=(0,5))
+    simulationLimit10 = SimulateMuonLifetime(muLifetimeTruth, distributionLimits=(0,10))
+    simulationLimit100 = SimulateMuonLifetime(muLifetimeTruth, distributionLimits=(0,100))
+    simulatedLifetimes = simulationLimit10.sampleLifetimes(N)
     print(f"Simulated average muon lifetime for single simulation run is {simulationLimit10.computeEstimatedLifetime():.3f} mus")
 
     plt.hist(simulatedLifetimes, bins=100, density=True)
-    plt.plot(np.linspace(0, 10, N), simulationLimit10.exponantialTruth(np.linspace(0, 10, N), muLifetimeTruth))
+    plt.plot(np.linspace(0, 10, N), 
+             simulationLimit10.exponantialTruth(np.linspace(0, 10, N), muLifetimeTruth)
+    )
     plt.show()
 
     multipleSimulatedLifetimes10 = []
@@ -89,15 +106,15 @@ def test():
     multipleSimulatedLifetimes5 = []
     for _ in range(500):
         # limit 10
-        _ = simulationLimit10.simulateLifetimes()
+        _ = simulationLimit10.sampleLifetimes(N)
         multipleSimulatedLifetimes10.append(simulationLimit10.computeEstimatedLifetime())
     
         # limit 100
-        _ = simulationLimit100.simulateLifetimes()
+        _ = simulationLimit100.sampleLifetimes(N)
         multipleSimulatedLifetimes100.append(simulationLimit100.computeEstimatedLifetime())
 
         # limit 10
-        _ = simulationLimit5.simulateLifetimes()
+        _ = simulationLimit5.sampleLifetimes(N)
         multipleSimulatedLifetimes5.append(simulationLimit5.computeEstimatedLifetime())
 
     plt.hist(multipleSimulatedLifetimes10, bins = 50)
