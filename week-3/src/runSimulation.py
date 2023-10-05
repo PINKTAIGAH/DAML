@@ -32,7 +32,7 @@ def main():
     plt.xlim(LIMITS_1)
     plt.title("Distribution of randomly sampled muon lifetimes")
     plt.legend()
-    plt.savefig("../figures/sampled_distribution.png")
+    plt.savefig("figures/sampled_distribution.png")
     plt.show()
     
     """
@@ -84,7 +84,7 @@ def main():
     plt.title("Probability distribution function of simulated muon lifetimes")
     plt.vlines(MU_LIFETIME_TRUTH, 0, yMax, colors="k", linestyles="dashed", label="True muon lifetime" )
     plt.legend()
-    plt.savefig("../figures/simulated_distribution.png")
+    plt.savefig("figures/simulated_distribution.png")
     plt.show()
     
 if __name__ == "__main__":
