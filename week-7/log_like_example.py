@@ -8,7 +8,7 @@ def gendata(N):
     """ Return the times from the exponential distribution """
     return scipy.stats.expon(scale=tau_true).rvs(N)
 
-TOBS = gendata(100)
+TOBS = gendata(1000)
 
 plt.hist(TOBS)
 
@@ -31,4 +31,6 @@ res = scipy.optimize.minimize(like,[1],args=(TOBS))
 print (res)
 
 print ('our best fit tau is' ,res.x, 'the true one is ', tau_true)
-plt.plot()
+
+plt.show()
+
