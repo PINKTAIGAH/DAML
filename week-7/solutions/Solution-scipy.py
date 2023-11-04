@@ -75,7 +75,7 @@ class Exponential:
 class ExponentialWithResonance:
     
     # Constructor
-    def __init__(self, lolim, hilim, params  ):
+    def __init__(self, lolim, hilim, params ):
         self.lolimit = lolim
         self.hilimit = hilim
         self.setParameters( params )
