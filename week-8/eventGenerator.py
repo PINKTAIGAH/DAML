@@ -2,6 +2,7 @@ import numpy as np
 import math as m
 import random
 from utils import *
+import matplotlib.pyplot as plt
 
 class Linear(object):
     """
@@ -139,4 +140,55 @@ class SignalWithBackground(object):
         # Add filtered x to mass list irrespective of what distribution it was drawn from
         self.mass.append(filteredX)
         return filteredX
+
+
+def single_toy(mean, sigma, slope, intercept, bounds, n_events_signal=300, n_events_background=10000, n_bins=100):
+    """
+    Generate a toy dataset of a gaussian signal with linear background
+    """
+        
+    if not isinstance(bounds, tuple):
+        raise TypeError("Variable bound must be a tuple with the form (boundMin, boundMax)")
+    if not len(bounds) == 2:
+        raise ValueError("Variable bound must have form (boundMin, boundMax)")
+
+    n_events_total = n_events_signal + n_events_background
+    signal_fraction = n_events_signal/n_events_total
+    # Generate pdf object
+    pdf = SignalWithBackground(mean, sigma, slope, intercept, bounds, signalFraction=signal_fraction)
+
+    # Generate random events
+    for _ in range(n_events_total): pdf.next()
+
+    # Get events for each distribution
+    data = pdf.mass
+    signal_data = pdf.massSignal
+    background_data = pdf.massBackground
+    
+    axes_data = [signal_data, background_data, data]
+    axes_titles = [
+        f"Signal distribution ({n_events_signal}  events)",
+        f"Background distribution ({n_events_background}  events)",
+        f"Overall distribution ({n_events_total}  events)",
+    ]
+
+    # Plot data
+    fig, axes = plt.subplots(3, 1, sharex="col")
+
+    for idx in range(len(axes)):
+        axes[idx].hist(axes_data[idx], bins = n_bins)
+        axes[idx].set_title(axes_titles[idx])
+    
+    axes[-1].set_xlabel("x")
+    fig.tight_layout()
+    plt.show()
+
+if __name__ == "__main__":
+    single_toy(10, 0.5, -1, 20, (0, 20),)
+
+
+
+
+
+
 
