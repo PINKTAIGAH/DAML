@@ -1,8 +1,7 @@
 import numpy as np
 import math as m
 import random
-from utils import *
-import matplotlib.pyplot as plt
+from utils import find_max
 
 class Linear(object):
     """
@@ -51,6 +50,13 @@ class Linear(object):
                 self.mass.append(filteredX)
                 return filteredX
 
+    def getMass(self,):
+        """
+        Return numpy array containing all generated values
+        """
+
+        return np.array(self.mass)
+
 class Gaussian(object):
     """
     Class that will generate a random value according to a gaussian distribution using numpy.random.normal
@@ -85,9 +91,17 @@ class Gaussian(object):
         Will return and append generated variable to mass list.
         """
 
-        x = np.random.normal(self.mean, self.sigma, size=1)
+        # Use .item() to append vsariable inside array and not array itself
+        x = np.random.normal(self.mean, self.sigma, size=1).item()
         self.mass.append(x)
         return x
+
+    def getMass(self,):
+        """
+        Return numpy array containing all generated values
+        """
+
+        return np.array(self.mass)
 
 class SignalWithBackground(object):
     """
@@ -141,54 +155,23 @@ class SignalWithBackground(object):
         self.mass.append(filteredX)
         return filteredX
 
+    def getMass(self,):
+        """
+        Return numpy array containing all generated values for overall distribution
+        """
 
-def single_toy(mean, sigma, slope, intercept, bounds, n_events_signal=300, n_events_background=10000, n_bins=100):
-    """
-    Generate a toy dataset of a gaussian signal with linear background
-    """
-        
-    if not isinstance(bounds, tuple):
-        raise TypeError("Variable bound must be a tuple with the form (boundMin, boundMax)")
-    if not len(bounds) == 2:
-        raise ValueError("Variable bound must have form (boundMin, boundMax)")
+        return np.array(self.mass)
 
-    n_events_total = n_events_signal + n_events_background
-    signal_fraction = n_events_signal/n_events_total
-    # Generate pdf object
-    pdf = SignalWithBackground(mean, sigma, slope, intercept, bounds, signalFraction=signal_fraction)
+    def getMassBackground(self,):
+        """
+        Return numpy array containing all generated values for background distribution
+        """
 
-    # Generate random events
-    for _ in range(n_events_total): pdf.next()
+        return np.array(self.massBackground)
 
-    # Get events for each distribution
-    data = pdf.mass
-    signal_data = pdf.massSignal
-    background_data = pdf.massBackground
-    
-    axes_data = [signal_data, background_data, data]
-    axes_titles = [
-        f"Signal distribution ({n_events_signal}  events)",
-        f"Background distribution ({n_events_background}  events)",
-        f"Overall distribution ({n_events_total}  events)",
-    ]
+    def getMassSignal(self,):
+        """
+        Return numpy array containing all generated values for signal distribution
+        """
 
-    # Plot data
-    fig, axes = plt.subplots(3, 1, sharex="col")
-
-    for idx in range(len(axes)):
-        axes[idx].hist(axes_data[idx], bins = n_bins)
-        axes[idx].set_title(axes_titles[idx])
-    
-    axes[-1].set_xlabel("x")
-    fig.tight_layout()
-    plt.show()
-
-if __name__ == "__main__":
-    single_toy(10, 0.5, -1, 20, (0, 20),)
-
-
-
-
-
-
-
+        return np.array(self.massSignal)
