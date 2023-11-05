@@ -7,16 +7,18 @@ from eventGenerator import SignalWithBackground
 
 def single_toy(
     mean, sigma, slope, intercept, bounds, n_events_signal=300, 
-    n_events_background=10000, n_bins=100, save_plot=False,
+    n_events_background=10000, n_bins=100, plot_distribution=False,
 ):
     """
     Generate a toy dataset of a gaussian signal with linear background
     """
         
-    if not isinstance(bounds, tuple):
+    if (not isinstance(bounds, tuple)):
         raise TypeError("Variable bound must be a tuple with the form (boundMin, boundMax)")
-    if not len(bounds) == 2:
+    if (not len(bounds)) == 2:
         raise ValueError("Variable bound must have form (boundMin, boundMax)")
+    if (not bounds[0] < bounds[1]):
+        raise ValueError("First element in tuple must be smaller than second")
 
     n_events_total = n_events_signal + n_events_background
     signal_fraction = n_events_signal/n_events_total
@@ -30,8 +32,10 @@ def single_toy(
     data = pdf.getMass()
     signal_data = pdf.getMassSignal()
     background_data = pdf.getMassBackground()
-    
-    plot_signal_with_linear(data, signal_data, background_data, n_bins=n_bins, save_plot=save_plot)
+
+    # Plot the toy dataset if requested
+    if plot_distribution:
+        plot_signal_with_linear(data, signal_data, background_data, bounds, n_bins=n_bins)
 
 
 """
@@ -50,15 +54,15 @@ def excercise_1():
     SIGMA = 0.5
     SLOPE = -1.0
     INTERCEPT = 20.0
-    N_SIGNAL_EVENT = 500
+    N_SIGNAL_EVENT = 300
     N_BACKGROUND_EVENTS = 10000
     N_BINS = 100
-    SAVE_PLOT = True
+    PLOT_DISTRIBUTION = True
     
     # Generate single toy dataset
     single_toy(
         MEAN, SIGMA, SLOPE, INTERCEPT, BOUNDS, n_events_signal=N_SIGNAL_EVENT,
-        n_events_background=N_BACKGROUND_EVENTS, save_plot=SAVE_PLOT
+        n_events_background=N_BACKGROUND_EVENTS, plot_distribution=PLOT_DISTRIBUTION, n_bins=N_BINS
     )
 
 if __name__ == "__main__":

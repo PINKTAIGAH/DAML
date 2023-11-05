@@ -14,6 +14,8 @@ class Linear(object):
             raise TypeError("Variable bound must be a tuple with the form (boundMin, boundMax)")
         if (not len(bounds) == 2):
             raise ValueError("Variable bound must have form (boundMin, boundMax)")
+        if (not bounds[0] < bounds[1]):
+            raise ValueError("First element in tuple must be smaller than second")
         
         # Initialise class variables
         self.intercept = intercept
@@ -68,6 +70,8 @@ class Gaussian(object):
             raise TypeError("Variable bound must be a tuple with the form (boundMin, boundMax)")
         if (not len(bounds) == 2):
             raise ValueError("Variable bound must have form (boundMin, boundMax)")
+        if (not bounds[0] < bounds[1]):
+            raise ValueError("First element in tuple must be smaller than second")
         
         # Initialise class variables
         self.mean = mean
@@ -116,6 +120,8 @@ class SignalWithBackground(object):
             raise TypeError("Variable bound must be a tuple with the form (boundMin, boundMax)")
         if not len(bounds) == 2:
             raise ValueError("Variable bound must have form (boundMin, boundMax)")
+        if (not bounds[0] < bounds[1]):
+            raise ValueError("First element in tuple must be smaller than second")
 
         self.signalFraction = signalFraction
         # Initialise lists to hold randomly generated values

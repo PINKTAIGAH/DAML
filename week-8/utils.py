@@ -12,7 +12,7 @@ def find_max(function, bound_low, bound_high, grid=100000,):
     y = function(x)
     return y.max()
 
-def plot_signal_with_linear(data, signal_data, background_data, n_bins=100, save_plot=False):
+def plot_signal_with_linear(data, signal_data, background_data, bounds, n_bins=100, save_plot=False):
     """
     Plot a figure of the distribution of the signal with background along with 
     individual components of the background and signal distribution
@@ -29,14 +29,15 @@ def plot_signal_with_linear(data, signal_data, background_data, n_bins=100, save
     fig, axes = plt.subplots(3, 1, sharex="col")
 
     for idx in range(len(axes)):
-        axes[idx].hist(axes_data[idx], bins = n_bins)
+        axes[idx].hist(axes_data[idx], bins = n_bins, range=bounds)
         axes[idx].set_title(axes_titles[idx])
     
-    axes[-1].set_xlabel("x (Events)")
+    axes[-1].set_xlabel("x")
+    fig.supylabel("Frequency of Events")
+
     fig.tight_layout()
 
-    if save_plot:
-        # Save the figure to plot directory
-        fig.savefig("plots/linear_with_background.png", dpi=600)
+    # Save plot to designated folder
+    fig.savefig("plots/linear_with_background.png", dpi=600)
 
     plt.show()
