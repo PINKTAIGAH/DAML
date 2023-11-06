@@ -67,11 +67,16 @@ class Linear(ProbabilityDensityFunction):
         # Find maximum value of the distribution within the bounds
         self.maxValue = find_max(self._evaluate, self.boundMin, self.boundMax)
 
-    def _evaluate(self, x):
+    def _evaluate(self, x, slope=None, intercept=None):
         """
         Evaluate the linear function of the distribution
         NOTE: Returns un-normalised values
         """
+
+        # Use default values for parameters of none are passed through kwargs
+        if slope == None:               slope = self.slope
+        if intercept == None:           intercept = self.intercept       
+
         return self.intercept + self.slope * x
 
     def next(self,):
@@ -109,12 +114,17 @@ class Gaussian(ProbabilityDensityFunction):
         # Find maximum value of the distribution within the bounds
         self.maxValue = find_max(self._evaluate, self.boundMin, self.boundMax)
 
-    def _evaluate(self, x):
+    def _evaluate(self, x, mean=None, sigma=None):
         """
         Evaluate the gaussian function of the distribution
         ##### NOTE: Returns un-normalised values between the bounds #####
         """
-        return 1/(self.sigma * np.sqrt(2.0*np.pi)) * np.exp( -(x-self.mean)**2 / (2.0 * self.sigma**2) )
+
+        # Use default values for parameters of none are passed through kwargs
+        if mean == None:                mean = self.mean
+        if sigma == None:               sigma = self.sigma
+
+        return 1/(sigma * np.sqrt(2.0*np.pi)) * np.exp( -(x-mean)**2 / (2.0 * sigma**2) )
 
     def next(self,):
         """
@@ -146,12 +156,23 @@ class SignalWithBackground(ProbabilityDensityFunction):
         self.signal = Gaussian(mean, sigma, bounds)
         self.background = Linear(slope, intercept, bounds)
 
-    def _evaluate(self, x):
+    def _evaluate(
+        self, x, signalFraction=None, mean=None, sigma=None, slope=None, intercept=None
+    ):
         """
         Evaluate the function of the distribution
         NOTE: Returns un-normalised values between the bounds
         """
-        return self.signalFraction*self.signal._evaluate(x) + (1-self.signalFraction)*self.background._evaluate(x)
+
+        # Use default values for parameters of none are passed through kwargs
+        if signalFraction == None:      signalFraction = self.signalFraction
+        if mean == None:                mean = self.singal.mean
+        if sigma == None:               sigma = self.signal.sigma
+        if slope == None:               slope = self.background.slope
+        if intercept == None:           intercept = self.background.intercept       
+
+        return self.signalFraction*self.signal._evaluate(x, mean=mean, sigma=sigma) + \
+                (1-self.signalFraction)*self.background._evaluate(x, slope=slope, intercept=intercept)
 
     def next(self,):
         """
