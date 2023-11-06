@@ -1,4 +1,4 @@
-from utils import plot_signal_with_linear, find_significance, print_question_header
+from utils import plot_signal_with_background, find_significance, print_question_header
 from eventGenerator import *
 import numpy as np
 
@@ -36,7 +36,7 @@ def single_toy(
     background_data = pdf.getMassBackground()
 
     # Plot the toy dataset if requested
-    plot_signal_with_linear(
+    plot_signal_with_background(
         data, signal_data, background_data, bounds, n_bins=n_bins, save_plot=plot_distribution,
     )
     
@@ -128,7 +128,7 @@ def excersice_3():
 
     background_event_ratio = possible_signal_integral/total_background_integral
 
-    print(f"Ratio between expected background events between {BOUNDS_LINEAR} and {BOUNDS_POSSIBLE_SIGNAL} is {background_event_ratio*100:.2f}%")
+    print(f"Ratio between expected background events between ranges {BOUNDS_LINEAR} and {BOUNDS_POSSIBLE_SIGNAL} is {background_event_ratio*100:.2f}%")
 
     # Compute significance of there being 300 aditional events for a background with 50% expected background events
     _, n_sigma = find_significance(pdf_gaussain, INTERVAL_LIMITS)
@@ -165,7 +165,7 @@ def excersice_4():
     print_question_header(question=4, mode="end")
 
 if __name__ == "__main__":
-    # excersice_1()
-    # excersice_2()
-    # excersice_3()
+    excersice_1()
+    excersice_2()
+    excersice_3()
     excersice_4()

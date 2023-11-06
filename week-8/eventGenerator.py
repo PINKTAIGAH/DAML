@@ -41,9 +41,9 @@ class Linear(object):
         """
 
         if (not isinstance(limits, tuple)):
-            raise TypeError("Variable bound must be a tuple with the form (boundMin, boundMax)")
+            raise TypeError("Variable bound must be a tuple with the form (limitMin, limitMax)")
         if (not len(limits) == 2):
-            raise ValueError("Variable bound must have form (boundMin, boundMax)")
+            raise ValueError("Variable bound must have form (limitMin, limitMax)")
         if (not limits[0] < limits[1]):
             raise ValueError("First element in tuple must be smaller than second")
         if (not limits[0] >= self.boundMin):
@@ -118,9 +118,9 @@ class Gaussian(object):
         """
 
         if (not isinstance(limits, tuple)):
-            raise TypeError("Variable bound must be a tuple with the form (boundMin, boundMax)")
+            raise TypeError("Variable bound must be a tuple with the form (limitMin, limitMax)")
         if (not len(limits) == 2):
-            raise ValueError("Variable bound must have form (boundMin, boundMax)")
+            raise ValueError("Variable bound must have form (limitMin, limitMax)")
         if (not limits[0] < limits[1]):
             raise ValueError("First element in tuple must be smaller than second")
         if (not limits[0] >= self.boundMin):
@@ -190,9 +190,9 @@ class SignalWithBackground(object):
         """
 
         if (not isinstance(limits, tuple)):
-            raise TypeError("Variable bound must be a tuple with the form (boundMin, boundMax)")
+            raise TypeError("Variable bound must be a tuple with the form (limitMin, limitMax)")
         if (not len(limits) == 2):
-            raise ValueError("Variable bound must have form (boundMin, boundMax)")
+            raise ValueError("Variable bound must have form (limitMin, limitMax)")
         if (not limits[0] < limits[1]):
             raise ValueError("First element in tuple must be smaller than second")
         if (not limits[0] >= self.boundMin):

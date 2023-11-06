@@ -16,7 +16,7 @@ def find_max(function, bound_low, bound_high, grid=100000,):
     """
     Return the maximum value of a function
     """
-    if not grid >= 0:
+    if (not grid >= 0):
         raise ValueError("Grid must be a a positive intiger")
     # Generate grid of x values
     x = np.linspace(bound_low, bound_high, num=grid, endpoint=True,)
@@ -38,9 +38,9 @@ def find_significance(pdf, interval_limits):
     # Compute Z score
     n_sigma = np.sqrt(2) * erfcinv(p_value)
 
-    return p_value, n_sigma 
+    return (p_value, n_sigma) 
 
-def plot_signal_with_linear(data, signal_data, background_data, bounds, n_bins=100, save_plot=False):
+def plot_signal_with_background(data, signal_data, background_data, bounds, n_bins=100, save_plot=False):
     """
     Plot a figure of the distribution of the signal with background along with 
     individual components of the background and signal distribution
