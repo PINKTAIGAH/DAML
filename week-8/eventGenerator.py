@@ -2,6 +2,7 @@ import numpy as np
 import math as m
 import random
 from utils import find_max
+from scipy.integrate import quad
 
 class Linear(object):
     """
@@ -32,6 +33,27 @@ class Linear(object):
         NOTE: Returns un-normalised values
         """
         return self.intercept + self.slope * x
+
+    def integrate(self, limits):
+        """
+        Evaluate the integral of the linear function within the specified bounds
+        ##### NOTE: Integral is not normalised within the specified bounds of the class #####
+        """
+
+        if (not isinstance(limits, tuple)):
+            raise TypeError("Variable bound must be a tuple with the form (boundMin, boundMax)")
+        if (not len(limits) == 2):
+            raise ValueError("Variable bound must have form (boundMin, boundMax)")
+        if (not limits[0] < limits[1]):
+            raise ValueError("First element in tuple must be smaller than second")
+        if (not limits[0] >= self.boundMin):
+            raise ValueError("Lower integral limit must be larger than lower bound of pdf")
+        if (not limits[1] <= self.boundMax):
+            raise ValueError("Higher integral limit must be smaller than upper bound of pdf")
+    
+        limitLow, limitHigh = limits
+        integralResult, IntegralError = quad(self._evaluate, limitLow, limitHigh) 
+        return integralResult
     
     def next(self,):
         """
@@ -85,9 +107,30 @@ class Gaussian(object):
     def _evaluate(self, x):
         """
         Evaluate the gaussian function of the distribution
-        NOTE: Returns un-normalised values between the bounds
+        ##### NOTE: Returns un-normalised values between the bounds #####
         """
         return 1/(self.sigma * np.sqrt(2.0*np.pi)) * np.exp( -(x-self.mean)**2 / (2.0 * self.sigma**2) )
+
+    def integrate(self, limits):
+        """
+        Evaluate the integral of the gaussian function within the specified bounds
+        ##### NOTE: Integral is not normalised within the specified bounds of the class #####
+        """
+
+        if (not isinstance(limits, tuple)):
+            raise TypeError("Variable bound must be a tuple with the form (boundMin, boundMax)")
+        if (not len(limits) == 2):
+            raise ValueError("Variable bound must have form (boundMin, boundMax)")
+        if (not limits[0] < limits[1]):
+            raise ValueError("First element in tuple must be smaller than second")
+        if (not limits[0] >= self.boundMin):
+            raise ValueError("Lower integral limit must be larger than lower bound of pdf")
+        if (not limits[1] <= self.boundMax):
+            raise ValueError("Higher integral limit must be smaller than upper bound of pdf")
+    
+        limitLow, limitHigh = limits
+        integralResult, IntegralError = quad(self._evaluate, limitLow, limitHigh) 
+        return integralResult
     
     def next(self,):
         """
@@ -139,6 +182,27 @@ class SignalWithBackground(object):
         NOTE: Returns un-normalised values between the bounds
         """
         return self.signalFraction*self.signal._evaluate(x) + (1-self.signalFraction)*self.background._evaluate(x)
+
+    def integrate(self, limits):
+        """
+        Evaluate the integral of the signal with background function within the specified bounds
+        ##### NOTE: Integral is not normalised within the specified bounds of the class #####
+        """
+
+        if (not isinstance(limits, tuple)):
+            raise TypeError("Variable bound must be a tuple with the form (boundMin, boundMax)")
+        if (not len(limits) == 2):
+            raise ValueError("Variable bound must have form (boundMin, boundMax)")
+        if (not limits[0] < limits[1]):
+            raise ValueError("First element in tuple must be smaller than second")
+        if (not limits[0] >= self.boundMin):
+            raise ValueError("Lower integral limit must be larger than lower bound of pdf")
+        if (not limits[1] <= self.boundMax):
+            raise ValueError("Higher integral limit must be smaller than upper bound of pdf")
+    
+        limitLow, limitHigh = limits
+        integralResult, IntegralError = quad(self._evaluate, limitLow, limitHigh) 
+        return integralResult
 
     def next(self,):
         """
