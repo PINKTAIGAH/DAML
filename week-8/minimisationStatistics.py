@@ -46,31 +46,39 @@ class NegativeLogLikelihood(MinimisationStatistic):
         # Initialise parent class
         super().__init__(pdf, data)
 
-    def evaluate(self, *fittingParameters):
+    def evaluateNull(self, slope, intercept):
         """
-        Evaluate negative log likelihood statisctic for passed parameters
+        evaluate negative log likelihood statisctic for passed parameters
         """
 
-        # Assign fitting parametes
-        match len(fittingParameters):
-            case 2: 
-                slope, intercept = fittingParameters
-                signalFraction = None
-            case 3:
-                signalFraction, slope, intercept = fittingParameters
-            case _:
-                raise ValueError("Variable fitting parameter has too many or too few elements. Should have 2 or 3")
+        # set new parameters
+        self.pdf.setParameters(slope=slope, intercept=intercept)
 
-        # Set new parameters
-        self.pdf.setParameters(signalFraction=signalFraction, slope=slope, intercept=intercept)
-
-        # Compute likelyhood using passed parameters
-        likelihood = self.pdf._evaluate(self.data,)
-        # Set any negative likelihoods to neglegable positive values
+        # compute likelyhood using passed parameters
+        normalisation = self.pdf.integrate((self.pdf.boundMin, self.pdf.boundMax))
+        likelihood = self.pdf._evaluate(self.data,) / normalisation 
+        # set any negative likelihoods to neglegable positive values
         if (likelihood <= 0).any():
             likelihood[likelihood<=0] = 1e-6
-        logLikelihood = np.log(likelihood)
-        return -logLikelihood.sum()
+        loglikelihood = np.log(likelihood)
+        return -loglikelihood.sum()
+
+    def evaluateAlternative(self, signalFraction, slope, intercept):
+        """
+        evaluate negative log likelihood statisctic for passed parameters
+        """
+
+        # set new parameters
+        self.pdf.setParameters(signalFraction, slope=slope, intercept=intercept)
+
+        # compute likelyhood using passed parameters
+        normalisation = self.pdf.integrate((self.pdf.boundMin, self.pdf.boundMax))
+        likelihood = self.pdf._evaluate(self.data,) / normalisation
+        # set any negative likelihoods to neglegable positive values
+        if (likelihood <= 0).any():
+            likelihood[likelihood<=0] = 1e-6
+        loglikelihood = np.log(likelihood)
+        return -loglikelihood.sum()
     
 class ChiSquared(MinimisationStatistic):
     """
@@ -126,7 +134,6 @@ class ChiSquaredModified(MinimisationStatistic):
         """
         Evaluate modified chi squared
         """
-
         # Set new parameters
         self.pdf.setParameters(slope=slope, intercept=intercept)
 

@@ -1,4 +1,4 @@
-from utils import plot_signal_with_background, find_significance, print_question_header
+from utils import plot_signal_with_background, find_significance, print_question_header, output_minuit_results
 from eventGenerator import *
 from minimisationStatistics import *
 import numpy as np
@@ -153,7 +153,7 @@ def excersice_4():
     SIGMA = 0.5
     SLOPE = -1.0
     INTERCEPT = 20.0
-    N_SIGNAL_EVENT =  400
+    N_SIGNAL_EVENT = 500 
     N_BACKGROUND_EVENTS = 10000
     N_BINS = 100
     PLOT_DISTRIBUTION = False 
@@ -168,21 +168,9 @@ def excersice_4():
 
     observed_data = pdf.getMass()
     
-    # Define initilal parameters form both hypothesis
-    null_hypothesis_p0 = {
-        "slope":            -0.5,
-        "intercept":        10.0,
-    }
-
-    alternate_hypothesis_p0 = {
-        "signalFraction":   0.5, 
-        "slope":            -0.5,
-        "intercept":        10.0,
-    }
-
     # Construct hypothesis objects
     null_hypothesis = SignalWithBackground(
-        mean=1e-6, sigma=1e-6, signalFraction=0, slope=SLOPE, intercept=INTERCEPT, bounds=BOUNDS,
+        mean=1e-6, sigma=1e-6, signalFraction=0.0, slope=SLOPE, intercept=INTERCEPT, bounds=BOUNDS,
     )
     alternative_hypothesis = SignalWithBackground(
         mean=MEAN, sigma=SIGMA, signalFraction=SIGNAL_FRACTION, slope=SLOPE, intercept=INTERCEPT, bounds=BOUNDS, 
@@ -190,32 +178,43 @@ def excersice_4():
 
     # Initialise minimisation statistic objects
     null_statistic = ChiSquaredModified(null_hypothesis, observed_data)
-    alternate_statistic = ChiSquaredModified(alternative_hypothesis, observed_data)
+    alternative_statistic = ChiSquaredModified(alternative_hypothesis, observed_data)
 
     # print(null_statistic.evaluate(SLOPE, INTERCEPT))
 
     #  Initialise minuit objects
-    m_null = Minuit( null_statistic.evaluateNull, slope=-0.5, intercept=10.0)
-    m_alternate = Minuit( alternate_statistic.evaluateAlternative, **alternate_hypothesis_p0,)
+    m_null = Minuit( null_statistic.evaluateNull, slope=-0.3, intercept=18.0,)
+    m_alternative = Minuit( alternative_statistic.evaluateAlternative, signalFraction=0.5, slope=-0.3, intercept=18.0)
 
     # Minimise hypothesis
     result_null = m_null.migrad()
-    result_alternative = m_alternate.migrad()
+    result_alternative = m_alternative.migrad()
 
-    print(result_null)
-    print("#"*20)
-    print(result_alternative)
+    # Print out and save minimised chi squared
+    chi_squared_null = output_minuit_results("Null hypotheses", result_null)
+    chi_squared_alternative = output_minuit_results("Alternative hypotheses", result_alternative)
     
     # Set optimal parameters to pdf objects
-    null_hypothesis.setParameters(*list(result_null.values))
-    alternative_hypothesis.setParameters(*list(result_alternative.values))
+    null_hypothesis.setParameters(
+        slope =           result_null.values["slope"],
+        intercept =       result_null.values["intercept"]
+    )
+    alternative_hypothesis.setParameters(
+        signalFraction =    result_alternative.values["signalFraction"],
+        slope =             result_alternative.values["slope"],
+        intercept =         result_alternative.values["intercept"],
+    )
 
     # Plot hypothesis
-    mass = np.linspace(*BOUNDS, 100,)
+    mass = np.linspace(*BOUNDS, 1000,)
 
     plt.hist(observed_data, bins=100, density=True)
-    # plt.plot(mass, null_hypothesis._evaluate(mass)/null_hypothesis.integrate(BOUNDS))
-    plt.plot(mass, alternative_hypothesis._evaluate(mass)/alternative_hypothesis.integrate(BOUNDS))
+    plt.plot(mass, null_hypothesis._evaluate(mass)/null_hypothesis.integrate(BOUNDS), c="k", label="Null hypothesis")
+    plt.plot(mass, alternative_hypothesis._evaluate(mass)/alternative_hypothesis.integrate(BOUNDS), c="r", label="Alternate hypothesis")
+    plt.legend()
+    plt.title("Observed data with fitted hypothese")
+    plt.xlabel("mass, m (GeV)")
+    plt.ylabel("Frecuency of measurments (counts)")
     plt.show()
 
     print_question_header(question=4, mode="end")

@@ -12,6 +12,15 @@ def print_question_header(question, mode=None):
         case "end":
             print("\n" + "#"*10 + f" End of question {question} " + "#"*10 + "\n")
 
+def output_minuit_results(minimised_name, results):
+    """
+    Print the minimised function and number of dof for a minimised minuit object
+    Also returns the minimised function value
+    """
+
+    print(f"{minimised_name}: \t chi_squared = {results.fval:.2f} ##### n_dof = {results.ndof:.0f}")
+    return results.fval
+
 def find_max(function, bound_low, bound_high, grid=100000,):
     """
     Return the maximum value of a function

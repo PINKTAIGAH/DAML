@@ -80,7 +80,7 @@ class Linear(ProbabilityDensityFunction):
         Evaluate the linear function of the distribution
         NOTE: Returns un-normalised values
         """
-
+        
         return self.intercept + self.slope * x
 
     def next(self,):
@@ -108,12 +108,8 @@ class Linear(ProbabilityDensityFunction):
         """
 
         # Use default values for parameters of none are passed through kwargs
-        if slope == None:               slope = self.slope
-        if intercept == None:           intercept = self.intercept       
-
-        # Update parameters of pdf object
-        self.slope = slope
-        self.intercept = intercept
+        if not slope == None:                   self.slope = slope
+        if not intercept == None:               self.intercept = intercept       
 
 class Gaussian(ProbabilityDensityFunction):
     """
@@ -156,12 +152,8 @@ class Gaussian(ProbabilityDensityFunction):
         """
 
         # Use default values for parameters of none are passed through kwargs
-        if mean == None:                mean = self.mean
-        if sigma == None:               sigma = self.sigma
-
-        # Update parameters of pdf object
-        self.mean = mean
-        self.sigma = sigma
+        if mean == None:                self.mean = mean 
+        if sigma == None:               self.sigma = sigma
 
 
 class SignalWithBackground(ProbabilityDensityFunction):
@@ -232,13 +224,9 @@ class SignalWithBackground(ProbabilityDensityFunction):
         Set passed variables as parameters for pdf
         """
 
-        # Use default values for parameters of none are passed through kwargs
+        # Update parameters to variables that have been passed through the method
         if not signalFraction == None:      self.signalFraction = signalFraction
         if not mean == None:                self.signal.mean = mean
-        if not sigma == None:               
-        if not slope == None:               self.background.slope
-        if not intercept == None:           intercept = self.background.intercept       
-
-        # Update parameters of constituent object
-        self.signal.setParameters(mean=mean, sigma=sigma)
-        self.background.setParameters(slope=self.slope, intercept=self.intercept)
+        if not sigma == None:               self.signal.sigma = sigma 
+        if not slope == None:               self.background.slope = slope
+        if not intercept == None:           self.background.intercept = intercept
