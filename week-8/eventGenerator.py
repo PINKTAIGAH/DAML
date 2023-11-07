@@ -4,6 +4,10 @@ import random
 from utils import find_max
 from scipy.integrate import quad
 
+"""
+########## Parent Classes ##########
+"""
+
 class ProbabilityDensityFunction(object):
     """
     Parent class containing common methods and members to be used by all pdf classes
@@ -50,6 +54,10 @@ class ProbabilityDensityFunction(object):
         """
 
         return np.array(self.mass)
+    
+"""
+########## Child Classes ##########
+"""
 
 class Linear(ProbabilityDensityFunction):
     """
