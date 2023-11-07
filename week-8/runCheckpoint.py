@@ -1,6 +1,8 @@
 from utils import plot_signal_with_background, find_significance, print_question_header
 from eventGenerator import *
+from minimisationStatistics import *
 import numpy as np
+from iminuit import Minuit
 
 """
 #################### FUNCTIONS ######################
@@ -151,10 +153,12 @@ def excersice_4():
     SIGMA = 0.5
     SLOPE = -1.0
     INTERCEPT = 20.0
-    N_SIGNAL_EVENT = 150 
+    N_SIGNAL_EVENT =  400
     N_BACKGROUND_EVENTS = 10000
     N_BINS = 100
     PLOT_DISTRIBUTION = False 
+    TOTAL_EXPECTED_EVENTS = N_SIGNAL_EVENT + N_BACKGROUND_EVENTS
+    SIGNAL_FRACTION = N_SIGNAL_EVENT/TOTAL_EXPECTED_EVENTS
 
     # Generate SignalWithBackground object
     pdf = single_toy(
@@ -162,10 +166,62 @@ def excersice_4():
         n_events_background=N_BACKGROUND_EVENTS, n_bins=N_BINS, plot_distribution=PLOT_DISTRIBUTION 
     )
 
+    observed_data = pdf.getMass()
+    
+    # Define initilal parameters form both hypothesis
+    null_hypothesis_p0 = {
+        "slope":            -0.5,
+        "intercept":        10.0,
+    }
+
+    alternate_hypothesis_p0 = {
+        "signalFraction":   0.5, 
+        "slope":            -0.5,
+        "intercept":        10.0,
+    }
+
+    # Construct hypothesis objects
+    null_hypothesis = SignalWithBackground(
+        mean=1e-6, sigma=1e-6, signalFraction=0, slope=SLOPE, intercept=INTERCEPT, bounds=BOUNDS,
+    )
+    alternative_hypothesis = SignalWithBackground(
+        mean=MEAN, sigma=SIGMA, signalFraction=SIGNAL_FRACTION, slope=SLOPE, intercept=INTERCEPT, bounds=BOUNDS, 
+    )
+
+    # Initialise minimisation statistic objects
+    null_statistic = ChiSquaredModified(null_hypothesis, observed_data)
+    alternate_statistic = ChiSquaredModified(alternative_hypothesis, observed_data)
+
+    # print(null_statistic.evaluate(SLOPE, INTERCEPT))
+
+    #  Initialise minuit objects
+    m_null = Minuit( null_statistic.evaluateNull, slope=-0.5, intercept=10.0)
+    m_alternate = Minuit( alternate_statistic.evaluateAlternative, **alternate_hypothesis_p0,)
+
+    # Minimise hypothesis
+    result_null = m_null.migrad()
+    result_alternative = m_alternate.migrad()
+
+    print(result_null)
+    print("#"*20)
+    print(result_alternative)
+    
+    # Set optimal parameters to pdf objects
+    null_hypothesis.setParameters(*list(result_null.values))
+    alternative_hypothesis.setParameters(*list(result_alternative.values))
+
+    # Plot hypothesis
+    mass = np.linspace(*BOUNDS, 100,)
+
+    plt.hist(observed_data, bins=100, density=True)
+    # plt.plot(mass, null_hypothesis._evaluate(mass)/null_hypothesis.integrate(BOUNDS))
+    plt.plot(mass, alternative_hypothesis._evaluate(mass)/alternative_hypothesis.integrate(BOUNDS))
+    plt.show()
+
     print_question_header(question=4, mode="end")
 
 if __name__ == "__main__":
-    excersice_1()
-    excersice_2()
-    excersice_3()
+    # excersice_1()
+    # excersice_2()
+    # excersice_3()
     excersice_4()

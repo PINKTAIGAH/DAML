@@ -22,6 +22,16 @@ class MinimisationStatistic(object):
         
         self.data = data
 
+    def findNormalisationFactor(self,):
+        """
+        Find integral of pdf 
+        """
+        
+        # Define integration limits
+        normalisationLimits = (self.pdf.boundMin, self.pdf.boundMax)
+
+        return self.pdf.integrate(normalisationLimits)
+
 """
 ########## Child Classes ###########
 """
@@ -51,8 +61,11 @@ class NegativeLogLikelihood(MinimisationStatistic):
             case _:
                 raise ValueError("Variable fitting parameter has too many or too few elements. Should have 2 or 3")
 
+        # Set new parameters
+        self.pdf.setParameters(signalFraction=signalFraction, slope=slope, intercept=intercept)
+
         # Compute likelyhood using passed parameters
-        likelihood = self.pdf._evaluate(self.data, signalFraction=signalFraction, slope=slope, intercept=intercept)
+        likelihood = self.pdf._evaluate(self.data,)
         # Set any negative likelihoods to neglegable positive values
         if (likelihood <= 0).any():
             likelihood[likelihood<=0] = 1e-6
@@ -86,8 +99,11 @@ class ChiSquared(MinimisationStatistic):
             case _:
                 raise ValueError("Variable fitting parameter has too many or too few elements. Should have 2 or 3")
 
+        # Set new parameters
+        self.pdf.setParameters(signalFraction=signalFraction, slope=slope, intercept=intercept)
+
         # Compute predicted value by model
-        predicted_data = self.pdf._evaluate(self.data, signalFraction=signalFraction, slope=slope, intercept=intercept)
+        predicted_data = self.pdf._evaluate(self.data,)
 
         return (predicted_data-self.data)**2/self.dataUncertanty
 
@@ -102,29 +118,48 @@ class ChiSquaredModified(MinimisationStatistic):
         super().__init__(pdf, data)
 
         # Define class members
-        self.nObservedMeasurments, bins = plt.hist(self.pdf.mass, bins=nBins)
-        self.massBins = bins + (bins[1]-bins[0])/2                         # Center-point value of bins
+        self.nObservedMeasurments, bins , _ = plt.hist(data, bins=nBins, density=True)
+        self.massBins = ( bins + (bins[1]-bins[0])/2 )[:-1]          # Center-point value of bins (Eliminate last element)
 
-    def evaluate(self, *fittingParameters):
+
+    def evaluateNull(self, slope, intercept):
         """
         Evaluate modified chi squared
         """
 
-        # Assign fitting parametes
-        match len(fittingParameters):
-            case 2: 
-                slope, intercept = fittingParameters
-                signalFraction = None
-            case 3:
-                signalFraction, slope, intercept = fittingParameters
-            case _:
-                raise ValueError("Variable fitting parameter has too many or too few elements. Should have 2 or 3")
+        # Set new parameters
+        self.pdf.setParameters(slope=slope, intercept=intercept)
 
-        nExpectedMeasurments = self.pdf._evaluate(self.massBins, signalFraction=signalFraction, slope=slope, intercept=intercept)
+        # Compute normalised expected measurments
+        nExpectedMeasurments = self.pdf._evaluate(self.massBins,) / self.findNormalisationFactor()
+
+        # limit outputs of Expected obs to positive
+        if (nExpectedMeasurments <= 0).any():
+            nExpectedMeasurments[nExpectedMeasurments<=0] = 1e-3
 
         summand = nExpectedMeasurments - self.nObservedMeasurments + self.nObservedMeasurments*np.log(self.nObservedMeasurments/nExpectedMeasurments)
 
         return 2*summand.sum()
+
+    def evaluateAlternative(self, signalFraction, slope, intercept):
+        """
+        Evaluate modified chi squared
+        """
+
+        # Set new parameters
+        self.pdf.setParameters(signalFraction=signalFraction, slope=slope, intercept=intercept)
+
+        # Compute normalised expected measurments
+        nExpectedMeasurments = self.pdf._evaluate(self.massBins,) / self.findNormalisationFactor()
+
+        # limit outputs of Expected obs to positive
+        if (nExpectedMeasurments <= 0).any():
+            nExpectedMeasurments[nExpectedMeasurments<=0] = 1e-3
+
+        summand = nExpectedMeasurments - self.nObservedMeasurments + self.nObservedMeasurments*np.log(self.nObservedMeasurments/nExpectedMeasurments)
+
+        return 2*summand.sum()
+
 
 if __name__ == "__main__":
 

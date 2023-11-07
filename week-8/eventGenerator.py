@@ -75,15 +75,11 @@ class Linear(ProbabilityDensityFunction):
         # Find maximum value of the distribution within the bounds
         self.maxValue = find_max(self._evaluate, self.boundMin, self.boundMax)
 
-    def _evaluate(self, x, slope=None, intercept=None):
+    def _evaluate(self, x,):
         """
         Evaluate the linear function of the distribution
         NOTE: Returns un-normalised values
         """
-
-        # Use default values for parameters of none are passed through kwargs
-        if slope == None:               slope = self.slope
-        if intercept == None:           intercept = self.intercept       
 
         return self.intercept + self.slope * x
 
@@ -105,6 +101,19 @@ class Linear(ProbabilityDensityFunction):
                 filteredX = x
                 self.mass.append(filteredX)
                 return filteredX
+        
+    def setParameters(self, slope=None, intercept=None):
+        """
+        Set passed variables as parameters for pdf
+        """
+
+        # Use default values for parameters of none are passed through kwargs
+        if slope == None:               slope = self.slope
+        if intercept == None:           intercept = self.intercept       
+
+        # Update parameters of pdf object
+        self.slope = slope
+        self.intercept = intercept
 
 class Gaussian(ProbabilityDensityFunction):
     """
@@ -122,17 +131,13 @@ class Gaussian(ProbabilityDensityFunction):
         # Find maximum value of the distribution within the bounds
         self.maxValue = find_max(self._evaluate, self.boundMin, self.boundMax)
 
-    def _evaluate(self, x, mean=None, sigma=None):
+    def _evaluate(self, x,):
         """
         Evaluate the gaussian function of the distribution
         ##### NOTE: Returns un-normalised values between the bounds #####
         """
 
-        # Use default values for parameters of none are passed through kwargs
-        if mean == None:                mean = self.mean
-        if sigma == None:               sigma = self.sigma
-
-        return 1/(sigma * np.sqrt(2.0*np.pi)) * np.exp( -(x-mean)**2 / (2.0 * sigma**2) )
+        return 1/(self.sigma * np.sqrt(2.0*np.pi)) * np.exp( -(x-self.mean)**2 / (2.0 * self.sigma**2) )
 
     def next(self,):
         """
@@ -144,6 +149,20 @@ class Gaussian(ProbabilityDensityFunction):
         x = np.random.normal(self.mean, self.sigma, size=1).item()
         self.mass.append(x)
         return x
+
+    def setParameters(self, mean=None, sigma=None):
+        """
+        Set passed variables as parameters for pdf
+        """
+
+        # Use default values for parameters of none are passed through kwargs
+        if mean == None:                mean = self.mean
+        if sigma == None:               sigma = self.sigma
+
+        # Update parameters of pdf object
+        self.mean = mean
+        self.sigma = sigma
+
 
 class SignalWithBackground(ProbabilityDensityFunction):
     """
@@ -164,23 +183,14 @@ class SignalWithBackground(ProbabilityDensityFunction):
         self.signal = Gaussian(mean, sigma, bounds)
         self.background = Linear(slope, intercept, bounds)
 
-    def _evaluate(
-        self, x, signalFraction=None, mean=None, sigma=None, slope=None, intercept=None
-    ):
+    def _evaluate(self, x,):
         """
         Evaluate the function of the distribution
         NOTE: Returns un-normalised values between the bounds
         """
 
-        # Use default values for parameters of none are passed through kwargs
-        if signalFraction == None:      signalFraction = self.signalFraction
-        if mean == None:                mean = self.singal.mean
-        if sigma == None:               sigma = self.signal.sigma
-        if slope == None:               slope = self.background.slope
-        if intercept == None:           intercept = self.background.intercept       
-
-        return self.signalFraction*self.signal._evaluate(x, mean=mean, sigma=sigma) + \
-                (1-self.signalFraction)*self.background._evaluate(x, slope=slope, intercept=intercept)
+        return self.signalFraction*self.signal._evaluate(x,) + \
+                (1-self.signalFraction)*self.background._evaluate(x,) 
 
     def next(self,):
         """
@@ -216,3 +226,19 @@ class SignalWithBackground(ProbabilityDensityFunction):
         """
 
         return np.array(self.massSignal)
+
+    def setParameters(self, signalFraction=None, mean=None, sigma=None, slope=None, intercept=None):
+        """
+        Set passed variables as parameters for pdf
+        """
+
+        # Use default values for parameters of none are passed through kwargs
+        if not signalFraction == None:      self.signalFraction = signalFraction
+        if not mean == None:                self.signal.mean = mean
+        if not sigma == None:               
+        if not slope == None:               self.background.slope
+        if not intercept == None:           intercept = self.background.intercept       
+
+        # Update parameters of constituent object
+        self.signal.setParameters(mean=mean, sigma=sigma)
+        self.background.setParameters(slope=self.slope, intercept=self.intercept)
