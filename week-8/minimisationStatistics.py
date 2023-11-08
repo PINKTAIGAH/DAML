@@ -146,6 +146,9 @@ class ChiSquaredModified(MinimisationStatistic):
 
         summand = nExpectedMeasurments - self.nObservedMeasurments + self.nObservedMeasurments*np.log(self.nObservedMeasurments/nExpectedMeasurments)
 
+        if (summand == np.nan).any():
+            isNan=True
+
         return 2*summand.sum()
 
     def evaluateAlternative(self, signalFraction, slope, intercept):
@@ -164,6 +167,9 @@ class ChiSquaredModified(MinimisationStatistic):
             nExpectedMeasurments[nExpectedMeasurments<=0] = 1e-3
 
         summand = nExpectedMeasurments - self.nObservedMeasurments + self.nObservedMeasurments*np.log(self.nObservedMeasurments/nExpectedMeasurments)
+
+        if (summand == np.nan).any():
+            isNan=True
 
         return 2*summand.sum()
 

@@ -200,7 +200,7 @@ def excersice_4():
     SIGMA = 0.5
     SLOPE = -1.0
     INTERCEPT = 20.0
-    N_SIGNAL_EVENT = 150
+    N_SIGNAL_EVENT = 500 
     N_BACKGROUND_EVENTS = 10000
     N_BINS = 100
     PLOT_DISTRIBUTION = False 
@@ -291,17 +291,20 @@ def excersice_5():
             MEAN, SIGMA, SLOPE, INTERCEPT, BOUNDS, N_SIGNAL_EVENT, N_BACKGROUND_EVENTS, N_BINS,
         )
         delta_chi_squared_array.append(delta_chi_squared) 
-    # Convert list to numpy array
+        # Print out progress of loop
+        if (epoch+1) % 10 == 0:
+            print(f"Progress:\t{epoch+1}/{N_DELTA_CHI_SQUARED_EVENTS}")
+    # Convert list to numprodsingle_mu_bnblike.fclpy array
     delta_chi_squared_array = np.array(delta_chi_squared_array)
 
     plt.close()
     # Plot delta chi squared distribution
     fig, axes = plt.subplots(2, 1,)
-    axes[0].hist(delta_chi_squared_array, bins=N_BINS, density=True, color="hotpink", range=(0.0, 0.006))
+    axes[0].hist(delta_chi_squared_array, bins=N_BINS, density=True, color="hotpink", range=(0.0, 0.0010))
     axes[0].set_ylabel("Probability")
     axes[0].set_xlabel(r"$\Delta\chi^2$ statistic (Wilk's Theorem)")
     axes[0].set_title(r"$\Delta\chi^2$ Probability density function")
-    axes[1].hist(delta_chi_squared_array, bins=N_BINS, density=True, color="hotpink", cumulative=True, range=(0.0, 0.006))
+    axes[1].hist(delta_chi_squared_array, bins=N_BINS, density=True, color="hotpink", cumulative=True, range=(0.0, 0.0010))
     axes[1].set_ylabel("Probability")
     axes[1].set_title(r'$\Delta\chi^2$ Cumulative density function')
     axes[1].set_xlabel(r"Cumulative $\Delta\chi^2$ statistic (Wilk's Theorem)")
@@ -312,8 +315,8 @@ def excersice_5():
     print_question_header(question=5, mode="end")
 
 if __name__ == "__main__":
-    excersice_1()
-    excersice_2()
-    excersice_3()
-    excersice_4()
+    # excersice_1()
+    # excersice_2()
+    # excersice_3()
+    # excersice_4()
     excersice_5()
