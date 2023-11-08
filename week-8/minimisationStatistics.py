@@ -144,6 +144,10 @@ class ChiSquaredModified(MinimisationStatistic):
         if (nExpectedMeasurments <= 0).any():
             nExpectedMeasurments[nExpectedMeasurments<=0] = 1e-3
 
+        if (nExpectedMeasurments <= 0).any():
+            isZero = True
+
+        print(nExpectedMeasurments)
         summand = nExpectedMeasurments - self.nObservedMeasurments + self.nObservedMeasurments*np.log(self.nObservedMeasurments/nExpectedMeasurments)
 
         if (summand == np.nan).any():
@@ -165,6 +169,9 @@ class ChiSquaredModified(MinimisationStatistic):
         # limit outputs of Expected obs to positive
         if (nExpectedMeasurments <= 0).any():
             nExpectedMeasurments[nExpectedMeasurments<=0] = 1e-3
+
+        if (nExpectedMeasurments <= 0).any():
+            isZero = True
 
         summand = nExpectedMeasurments - self.nObservedMeasurments + self.nObservedMeasurments*np.log(self.nObservedMeasurments/nExpectedMeasurments)
 

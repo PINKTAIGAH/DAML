@@ -318,5 +318,5 @@ if __name__ == "__main__":
     # excersice_1()
     # excersice_2()
     # excersice_3()
-    # excersice_4()
+    excersice_4()
     excersice_5()
