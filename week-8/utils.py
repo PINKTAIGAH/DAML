@@ -14,11 +14,10 @@ def print_question_header(question, mode=None):
 
 def output_minuit_results(minimised_name, results):
     """
-    Print the minimised function and number of dof for a minimised minuit object
-    Also returns the minimised function value
+    Print the minimised function and return the minimised function value
     """
 
-    print(f"{minimised_name}: \t chi_squared = {results.fval:.2f} ##### n_dof = {results.ndof:.0f}")
+    print(f"{minimised_name}: \t chi_squared = {results.fval:.4f}")
     return results.fval
 
 def find_max(function, bound_low, bound_high, grid=100000,):
@@ -42,12 +41,22 @@ def find_significance(pdf, interval_limits):
     interval_integral = pdf.integrate(interval_limits)
 
     # Compute p value of probability
-    p_value = interval_integral/full_integral
+    p_value = 1 - interval_integral/full_integral
 
-    # Compute Z score
-    n_sigma = np.sqrt(2) * erfcinv(p_value)
+    n_sigma = compute_z_score(p_value)
 
     return (p_value, n_sigma) 
+
+def compute_z_score(p_value):
+    """
+    Compute significance value from p_value
+    """
+
+    # Compute Z score
+    n_sigma = np.sqrt(2) * erfcinv(1 - p_value)
+
+    return n_sigma
+
 
 def plot_signal_with_background(data, signal_data, background_data, bounds, n_bins=100, save_plot=False):
     """
@@ -66,7 +75,7 @@ def plot_signal_with_background(data, signal_data, background_data, bounds, n_bi
     fig, axes = plt.subplots(3, 1, sharex="col")
 
     for idx in range(len(axes)):
-        axes[idx].hist(axes_data[idx], bins = n_bins, range=bounds)
+        axes[idx].hist(axes_data[idx], bins = n_bins, range=bounds, color="hotpink",)
         axes[idx].set_title(axes_titles[idx])
     
     axes[-1].set_xlabel("x")
