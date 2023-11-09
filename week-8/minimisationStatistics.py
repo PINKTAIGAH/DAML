@@ -129,30 +129,28 @@ class ChiSquaredModified(MinimisationStatistic):
         self.nObservedMeasurments, bins , _ = plt.hist(data, bins=nBins, density=True)
         self.massBins = ( bins + (bins[1]-bins[0])/2 )[:-1]          # Center-point value of bins (Eliminate last element)
 
+        # limit outputs of Observed measurmentsto positive
+        if (self.nObservedMeasurments <= 0).any():
+            self.nObservedMeasurments[self.nObservedMeasurments<=0] = 1e-7
 
     def evaluateNull(self, slope, intercept):
         """
         Evaluate modified chi squared
         """
-        # Set new parameters
-        self.pdf.setParameters(slope=slope, intercept=intercept)
+        # Set new parameters if passed parameters are not nan
+        if not (np.isnan(np.array([slope])).any()):
+            self.pdf.setParameters(slope=slope, intercept=intercept)
 
         # Compute normalised expected measurments
-        nExpectedMeasurments = self.pdf._evaluate(self.massBins,) / self.findNormalisationFactor()
+        normalisation = self.findNormalisationFactor()
+        nExpectedMeasurments = self.pdf._evaluate(self.massBins,) / normalisation
 
         # limit outputs of Expected obs to positive
         if (nExpectedMeasurments <= 0).any():
-            nExpectedMeasurments[nExpectedMeasurments<=0] = 1e-3
+            nExpectedMeasurments[nExpectedMeasurments<=0] = 1e-7
 
-        if (nExpectedMeasurments <= 0).any():
-            isZero = True
-
-        print(nExpectedMeasurments)
         summand = nExpectedMeasurments - self.nObservedMeasurments + self.nObservedMeasurments*np.log(self.nObservedMeasurments/nExpectedMeasurments)
-
-        if (summand == np.nan).any():
-            isNan=True
-
+        
         return 2*summand.sum()
 
     def evaluateAlternative(self, signalFraction, slope, intercept):
@@ -160,23 +158,19 @@ class ChiSquaredModified(MinimisationStatistic):
         Evaluate modified chi squared
         """
 
-        # Set new parameters
-        self.pdf.setParameters(signalFraction=signalFraction, slope=slope, intercept=intercept)
+        # Set new parameters if passed parameters are not nan
+        if not (np.isnan(slope).any()):
+            self.pdf.setParameters(signalFraction=signalFraction, slope=slope, intercept=intercept)
 
         # Compute normalised expected measurments
-        nExpectedMeasurments = self.pdf._evaluate(self.massBins,) / self.findNormalisationFactor()
+        normalisation = self.findNormalisationFactor()
+        nExpectedMeasurments = self.pdf._evaluate(self.massBins,) / normalisation
 
         # limit outputs of Expected obs to positive
         if (nExpectedMeasurments <= 0).any():
-            nExpectedMeasurments[nExpectedMeasurments<=0] = 1e-3
-
-        if (nExpectedMeasurments <= 0).any():
-            isZero = True
+            nExpectedMeasurments[nExpectedMeasurments<=0] = 1e-7
 
         summand = nExpectedMeasurments - self.nObservedMeasurments + self.nObservedMeasurments*np.log(self.nObservedMeasurments/nExpectedMeasurments)
-
-        if (summand == np.nan).any():
-            isNan=True
 
         return 2*summand.sum()
 

@@ -231,6 +231,10 @@ def excersice_4():
     m_null = Minuit( null_statistic.evaluateNull, slope=-0.3, intercept=18.0,)
     m_alternative = Minuit( alternative_statistic.evaluateAlternative, signalFraction=0.5, slope=-0.3, intercept=18.0)
 
+    # Set resonable limits for parameters of optimiser to ensure robustness
+    m_null.limits = [(-1.3, -0.5), (15.0, 20.5)]                    # Slope, intercept
+    m_alternative.limits = [(0, 1), (-1.3, -0.5), (15.0, 20.5)]     # Signal Fraction, Slope, Intercept 
+
     # Minimise hypothesis
     result_null = m_null.migrad()
     result_alternative = m_alternative.migrad()
