@@ -84,6 +84,10 @@ def compute_delta_chi_squared(
     m_null = Minuit( null_statistic.evaluateNull, slope=-0.3, intercept=18.0,)
     m_alternative = Minuit( alternative_statistic.evaluateAlternative, signalFraction=0.5, slope=-0.3, intercept=18.0)
 
+    # Set resonable limits for parameters of optimiser to ensure robustness
+    m_null.limits = [(-1.3, -0.5), (15.0, 20.5)]                    # Slope, intercept
+    m_alternative.limits = [(0, 1), (-1.3, -0.5), (15.0, 20.5)]     # Signal Fraction, Slope, Intercept 
+
     # Minimise hypothesis
     result_null = m_null.migrad()
     result_alternative = m_alternative.migrad()
@@ -122,6 +126,8 @@ def excersice_1():
         MEAN, SIGMA, SLOPE, INTERCEPT, BOUNDS, n_events_signal=N_SIGNAL_EVENT,
         n_events_background=N_BACKGROUND_EVENTS, plot_distribution=PLOT_DISTRIBUTION, n_bins=N_BINS
     )
+
+    print(f"Single toy dataset plotted.")
 
     print_question_header(question=1, mode="end")
 
@@ -178,7 +184,7 @@ def excersice_3():
 
     background_event_ratio = possible_signal_integral/total_background_integral
 
-    print(f"Ratio between expected background events between ranges {BOUNDS_LINEAR} and {BOUNDS_POSSIBLE_SIGNAL} is {background_event_ratio*100:.2f}%")
+    print(f"Using integration the ratio between expected background events between ranges {BOUNDS_LINEAR} and {BOUNDS_POSSIBLE_SIGNAL} was found to be {background_event_ratio*100:.2f}%")
 
     # Compute significance of there being 300 aditional events for a background with 50% expected background events
     _, n_sigma = find_significance(pdf_gaussain, INTERVAL_LIMITS)
@@ -200,12 +206,14 @@ def excersice_4():
     SIGMA = 0.5
     SLOPE = -1.0
     INTERCEPT = 20.0
-    N_SIGNAL_EVENT = 500 
+    N_SIGNAL_EVENT = 150 
     N_BACKGROUND_EVENTS = 10000
     N_BINS = 100
     PLOT_DISTRIBUTION = False 
     TOTAL_EXPECTED_EVENTS = N_SIGNAL_EVENT + N_BACKGROUND_EVENTS
     SIGNAL_FRACTION = N_SIGNAL_EVENT/TOTAL_EXPECTED_EVENTS
+
+    print(f"With {N_SIGNAL_EVENT} expected signal events and {N_BACKGROUND_EVENTS} background events:")
 
     # Generate SignalWithBackground object
     pdf = single_toy(
@@ -290,21 +298,23 @@ def excersice_5():
     # Array to contain delta chi squared
     delta_chi_squared_array = []
     # Iterate to compute multiple delta chi squared for linear distribution
+    print(f"Running {N_DELTA_CHI_SQUARED_EVENTS} optimisations. This may take several minutes.")
     for epoch in range(N_DELTA_CHI_SQUARED_EVENTS):
         delta_chi_squared = compute_delta_chi_squared(
             MEAN, SIGMA, SLOPE, INTERCEPT, BOUNDS, N_SIGNAL_EVENT, N_BACKGROUND_EVENTS, N_BINS,
         )
         delta_chi_squared_array.append(delta_chi_squared) 
         # Print out progress of loop
-        if (epoch+1) % 10 == 0:
+        if (epoch+1) % 100 == 0:
             print(f"Progress:\t{epoch+1}/{N_DELTA_CHI_SQUARED_EVENTS}")
     # Convert list to numprodsingle_mu_bnblike.fclpy array
     delta_chi_squared_array = np.array(delta_chi_squared_array)
 
-    plt.close()
+    plt.close("all")
     # Plot delta chi squared distribution
+    weights = np.ones_like(delta_chi_squared_array)/delta_chi_squared_array.size
     fig, axes = plt.subplots(2, 1,)
-    axes[0].hist(delta_chi_squared_array, bins=N_BINS, density=True, color="hotpink", range=(0.0, 0.0010))
+    axes[0].hist(delta_chi_squared_array, bins=N_BINS, weights=weights, color="hotpink", range=(0.0, 0.0010))
     axes[0].set_ylabel("Probability")
     axes[0].set_xlabel(r"$\Delta\chi^2$ statistic (Wilk's Theorem)")
     axes[0].set_title(r"$\Delta\chi^2$ Probability density function")
@@ -315,12 +325,11 @@ def excersice_5():
     fig.tight_layout()
     plt.show()
 
-
     print_question_header(question=5, mode="end")
 
 if __name__ == "__main__":
-    # excersice_1()
-    # excersice_2()
-    # excersice_3()
+    excersice_1()
+    excersice_2()
+    excersice_3()
     excersice_4()
     excersice_5()
