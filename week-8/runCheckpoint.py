@@ -256,7 +256,7 @@ def excersice_4():
     print(f"Wilk's Theorem: \t delta chi_squared = {delta_chi_squared:.4f}")
 
     # Find p-value and significance of deviation between two hypotheses
-    p_value = 1 - chi2.cdf(x=delta_chi_squared, df=1)
+    p_value = chi2.cdf(x=delta_chi_squared, df=1)
     n_sigma = compute_z_score(p_value)
     
     print(f"The significance that there is a deviation vetween the two hypothese is {n_sigma:.2f} sigma and a p value of {p_value:.3f}")

@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.special import erfcinv
+from scipy.special import erfinv
 
 def print_question_header(question, mode=None):
     """
@@ -41,7 +41,7 @@ def find_significance(pdf, interval_limits):
     interval_integral = pdf.integrate(interval_limits)
 
     # Compute p value of probability
-    p_value = 1 - interval_integral/full_integral
+    p_value = interval_integral/full_integral
 
     n_sigma = compute_z_score(p_value)
 
@@ -53,7 +53,7 @@ def compute_z_score(p_value):
     """
 
     # Compute Z score
-    n_sigma = np.sqrt(2) * erfcinv(1 - p_value)
+    n_sigma = np.sqrt(2) * erfinv(1 - p_value)
 
     return n_sigma
 
