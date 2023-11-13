@@ -152,8 +152,8 @@ class Gaussian(ProbabilityDensityFunction):
         """
 
         # Use default values for parameters of none are passed through kwargs
-        if mean == None:                self.mean = mean 
-        if sigma == None:               self.sigma = sigma
+        if not mean == None:                self.mean = mean 
+        if not sigma == None:               self.sigma = sigma
 
 
 class SignalWithBackground(ProbabilityDensityFunction):

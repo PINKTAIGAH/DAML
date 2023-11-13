@@ -292,7 +292,7 @@ def excersice_5():
     INTERCEPT = 20.0
     N_SIGNAL_EVENT = 0
     N_BACKGROUND_EVENTS = 10000
-    N_BINS = 100
+    N_BINS = 70
     N_DELTA_CHI_SQUARED_EVENTS = 1000
 
     # Array to contain delta chi squared
@@ -314,11 +314,11 @@ def excersice_5():
     # Plot delta chi squared distribution
     weights = np.ones_like(delta_chi_squared_array)/delta_chi_squared_array.size
     fig, axes = plt.subplots(2, 1,)
-    axes[0].hist(delta_chi_squared_array, bins=N_BINS, weights=weights, color="hotpink", range=(0.0, 0.0010))
+    axes[0].hist(delta_chi_squared_array, bins=N_BINS, weights=weights, color="hotpink", range=(0.0, 0.0020))
     axes[0].set_ylabel("Probability")
     axes[0].set_xlabel(r"$\Delta\chi^2$ statistic (Wilk's Theorem)")
     axes[0].set_title(r"$\Delta\chi^2$ Probability density function")
-    axes[1].hist(delta_chi_squared_array, bins=N_BINS, density=True, color="hotpink", cumulative=True, range=(0.0, 0.0010))
+    axes[1].hist(delta_chi_squared_array, bins=N_BINS, density=True, color="hotpink", cumulative=True, range=(0.0, 0.0020))
     axes[1].set_ylabel("Probability")
     axes[1].set_title(r'$\Delta\chi^2$ Cumulative density function')
     axes[1].set_xlabel(r"Cumulative $\Delta\chi^2$ statistic (Wilk's Theorem)")
