@@ -1,0 +1,18 @@
+run_cli           : True
+maximum_particles : 8
+
+datasets : 
+  chargino_chargino :
+    - datasets/chacha_cha300_neut140_chan2b.csv
+    - datasets/chacha_cha400_neut60_chan2b.csv
+    - datasets/chacha_cha600_neut200_chan2b.csv
+  chargino_neutralino :
+    - datasets/chaneut_cha200_neut50_chan2b.csv
+    - datasets/chaneut_cha250_neut150_chan2b.csv
+  z_lepton :
+    - datasets/pp23mt_50_chan2b.csv
+    - datasets/pp24mt_50_chan2b.csv
+  gluino_rpv :
+    - datasets/gluino_1000.0_neutralino_1.0_chan2b.csv
+    - datasets/stlp_st1000_chan2b.csv
+  background : datasets/background_chan2b_7.8.csv
