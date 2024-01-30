@@ -3,6 +3,24 @@
 /gun/particle e-
 /gun/energy 300 MeV
 /run/beamOn 0
+/vis/scene/notifyHandlers scene-0
+/process/inactivate eBrem
+/run/physicsModified
+/process/list
+/process/inactivate muioni
+/process/inactivate muIoni
+/run/physicsModified
+/gun/particle mu-
+/gun/energy 20 MeV
+/globalField/setValue 0.0 0.05 0.0 tesla
 /run/beamOn 20
-/vis/open OGLSX
-/vis/sceneHandler/create OGLSX
+/vis/viewer/set/viewpointThetaPhi 90 180
+/vis/viewer/refresh
+/vis/viewer/set/viewpointThetaPhi 90 150
+/vis/viewer/refresh
+/vis/viewer/set/viewpointThetaPhi 90 180
+/vis/viewer/refresh
+/vis/viewer/set/viewpointThetaPhi 120 150
+/vis/viewer/refresh
+/gun/List
+/gun/List
