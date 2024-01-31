@@ -1,4 +1,4 @@
-run_cli           : True
+run_cli           : False
 maximum_particles : 8
 
 datasets : 
