@@ -1,8 +1,12 @@
 file(REMOVE_RECURSE
   "CMakeFiles/MyProgram.dir/src/ActionInitialization.cpp.o"
+  "CMakeFiles/MyProgram.dir/src/ActionInitialization.cpp.o.d"
   "CMakeFiles/MyProgram.dir/src/DetectorConstruction.cpp.o"
+  "CMakeFiles/MyProgram.dir/src/DetectorConstruction.cpp.o.d"
   "CMakeFiles/MyProgram.dir/src/GeneratorAction.cpp.o"
+  "CMakeFiles/MyProgram.dir/src/GeneratorAction.cpp.o.d"
   "CMakeFiles/MyProgram.dir/src/main.cpp.o"
+  "CMakeFiles/MyProgram.dir/src/main.cpp.o.d"
   "MyProgram"
   "MyProgram.pdb"
 )
