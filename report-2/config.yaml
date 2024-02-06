@@ -1,18 +1,45 @@
-run_cli           : True 
-maximum_particles : 8
+# Configuration settings for the operation of jupyter notebook
+jupyter:
+  run_cli: False
 
-datasets : 
-  chargino_chargino :
-    - datasets/chacha_cha300_neut140_chan2b.csv
-    - datasets/chacha_cha400_neut60_chan2b.csv
-    - datasets/chacha_cha600_neut200_chan2b.csv
-  chargino_neutralino :
-    - datasets/chaneut_cha200_neut50_chan2b.csv
-    - datasets/chaneut_cha250_neut150_chan2b.csv
-  z_lepton :
-    - datasets/pp23mt_50_chan2b.csv
-    - datasets/pp24mt_50_chan2b.csv
-  gluino_rpv :
-    - datasets/gluino_1000.0_neutralino_1.0_chan2b.csv
-    - datasets/stlp_st1000_chan2b.csv
-  background : datasets/background_chan2b_7.8.csv
+# Configuration settings for model
+network:
+  input_dims    : 39
+  latent_dims   : 4
+  activation    : leaky
+  feature_dims  : 32
+
+# Dataloader configuration settings
+dataloader:
+  maximum_particles : 8
+  load_dataset      : False
+  save_dataset      : True
+  batch_size        : 256
+  raw_datasets      : 
+    chargino_chargino :
+      - raw_datasets/chacha_cha300_neut140_chan2b.csv
+      - raw_datasets/chacha_cha400_neut60_chan2b.csv
+      - raw_datasets/chacha_cha600_neut200_chan2b.csv
+    chargino_neutralino :
+      - raw_datasets/chaneut_cha200_neut50_chan2b.csv
+      - raw_datasets/chaneut_cha250_neut150_chan2b.csv
+    z_lepton :
+      - raw_datasets/pp23mt_50_chan2b.csv
+      - raw_datasets/pp24mt_50_chan2b.csv
+    gluino_rpv :
+      - raw_datasets/gluino_1000.0_neutralino_1.0_chan2b.csv
+      - raw_datasets/stlp_st1000_chan2b.csv
+    background : raw_datasets/background_chan2b_7.8.csv
+
+
+# Confuguration settings for trainer
+trainer:
+  run_id          : test_run
+  output_dir      : outputs/
+  model_name      : denseVAE
+  epochs          : 49
+  learning_rate   : 0.001
+  beta            : 1
+  optimiser       :
+    name    : adam
+    moments : 0.5

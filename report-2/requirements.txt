@@ -4,3 +4,5 @@ matplotlib
 tqdm
 pyarrow
 seaborn
+scikit-learn
+tensorboard
