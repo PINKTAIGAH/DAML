@@ -5,7 +5,7 @@ jupyter:
 # Configuration settings for model
 network:
   input_dims    : 39
-  latent_dims   : 4
+  latent_dims   : 3
   activation    : leaky
   feature_dims  : 32
 
@@ -34,10 +34,11 @@ dataloader:
 
 # Confuguration settings for trainer
 trainer:
+  device          : cuda
   run_id          : test_run
   output_dir      : outputs/
   model_name      : denseVAE
-  epochs          : 49
+  epochs          : 30
   learning_rate   : 0.001
   beta            : 1
   optimiser       :

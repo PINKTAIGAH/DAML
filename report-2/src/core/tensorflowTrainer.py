@@ -2,7 +2,7 @@ import os
 from collections import OrderedDict
 import tensorflow as tf
 from tqdm import tqdm
-from ..models import DenseVAE
+from ..models.tensorflow import DenseVAE, DenseAE
 from tensorflow.keras.metrics import mean_squared_error as MSE, kl_divergence as KL
 
 # Trun of tensorflow warnings
@@ -28,7 +28,13 @@ class Trainer(object):
         self.valData    = valData
 
         # Initialise network
-        self.network    = DenseVAE(config["network"]["input_dims"], config["network"]["latent_dims"]) 
+        self.network = None
+        if self.config["model_name"] == "denseVAE":
+            self.network    = DenseVAE(config["network"]["input_dims"], config["network"]["latent_dims"]) 
+        if self.config["model_name"] == "denseAE":
+            self.network    = DenseAE(config["network"]["input_dims"], config["network"]["latent_dims"]) 
+        if self.network is None:
+            raise Exception("YOU FUCKED UP")
 
         # Initialise optimiser
         if self.config["optimiser"]["name"] == "adam":
@@ -77,9 +83,7 @@ class Trainer(object):
         # Perform forward step
         with tf.GradientTape() as tape:
             # Compute network output
-            mean, logvar    = self.network.encode(input)
-            latentVector    = self.network.reparameterise(mean, logvar)
-            output          = self.network.decode(latentVector)
+            output = self.network(input)
 
             # Compute loss function
             loss = self.lossFunction(input, output)
@@ -98,9 +102,7 @@ class Trainer(object):
         """
         # Perform validation step
         # Compute network output
-        mean, logvar    = self.network.encode(input)
-        latentVector    = self.network.reparameterise(mean, logvar)
-        output          = self.network.decode(latentVector)
+        output = self.network(input)
 
         # Compute loss function
         loss = self.lossFunction(input, output)

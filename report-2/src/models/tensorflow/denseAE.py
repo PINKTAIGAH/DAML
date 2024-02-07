@@ -7,16 +7,16 @@ tf.autograph.set_verbosity(1)
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
-class DenseVAE(tf.keras.Model):
+class DenseAE(tf.keras.Model):
     """
-    Class for a 1D VAE using fully connected sense layers for auto-encoding implemented in tensorflow.
+    Class for a 1D AE using fully connected sense layers for auto-encoding implemented in tensorflow.
     Class is adapted from tensorflow example given in https://www.tensorflow.org/tutorials/generative/cvae.
     """
 
     def __init__(self, inputDims, latentDims, featureDims=32, activation="leaky"):
         
         # Initialise parent class
-        super(DenseVAE, self).__init__()
+        super(DenseAE, self).__init__()
         
         # Define class parameters
         self.latentDims = latentDims
@@ -32,7 +32,7 @@ class DenseVAE(tf.keras.Model):
             tf.keras.layers.Dense(featureDims/2),
             tf.keras.layers.LeakyReLU(0.2) if activation=="leaky" else tf.keras.layers.ReLU(),
             # Third dense layer w/ output being latent dims. This block will have no activation func
-            tf.keras.layers.Dense(self.latentDims+latentDims)
+            tf.keras.layers.Dense(self.latentDims)
         ])
 
         # Define decoder
@@ -48,33 +48,12 @@ class DenseVAE(tf.keras.Model):
             tf.keras.layers.Dense(self.inputDims)
         ])
 
-    @tf.function
-    def generateSample(self, epsilon=None):
-        """
-        Generate a sample using the decoder. Allows for the use of the reparametrasation trick by defining an epsilon to 
-        create random latent vector while not breaking backpropogation chain.
-        """
-        # Randomly generate epsilon if not provided
-        if epsilon is None:
-            epsilon = tf.random.normal(shape=(100, self.latent_dim))
-        
-        # Generate output 
-        output = self.decode(epsilon, applySigmoid=True)
-        return output
-
     def encode(self, x):
         """
         Return meana nd variance of the encoded latent vector
         """
-        mean, logvar = tf.split(self.encoder(x), num_or_size_splits=2, axis=1)
-        return mean, logvar
-
-    def reparameterise(self, mean, logvar):
-        """
-        Use the mean and variance of the encoded latent vector to create a reparametrised latent vector
-        """
-        eps = tf.random.normal(shape=mean.shape)
-        return eps * tf.exp(logvar * .5) + mean
+        latentVector = self.encoder(x)
+        return latentVector
 
     def decode(self, z, apply_sigmoid=False):
         """
@@ -86,6 +65,15 @@ class DenseVAE(tf.keras.Model):
             return probs
         return logits
 
+    def call(self, input):
+        """
+        Run block of code when object is called 
+        """
+        latentVector    = self.encode(input)
+        output          = self.decode(latentVector)
+
+        return output
+
 
 def test():
     # Test class
@@ -94,15 +82,11 @@ def test():
     batch_size = 7
     input = tf.random.normal(shape=(batch_size, input_dims))
 
-    model = DenseVAE(input_dims, latent_dims)
+    model = DenseAE(input_dims, latent_dims)
 
-    mean, logvar = model.encode(input)
-    z = model.reparameterise(mean, logvar)
-    output = model.decode(z)
+    output = model(input)
 
     print(input.shape)
-    print(mean.shape)
-    print(z.shape)
     print(output.shape)
 
 if __name__ == "__main__":

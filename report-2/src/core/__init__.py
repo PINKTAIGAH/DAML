@@ -1,2 +1,3 @@
 from .dataLoader import DataLoader
-from .trainer import Trainer
+from .tensorflowTrainer import Trainer
+from .dataclass import Dataclass
