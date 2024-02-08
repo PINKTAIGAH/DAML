@@ -11,7 +11,7 @@ tf.autograph.set_verbosity(1)
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
-class Trainer(object):
+class TensorflowTrainer(object):
     """
     Class used to train and validate a given model. Currently designed to train VAEs
     """

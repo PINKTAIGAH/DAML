@@ -4,24 +4,28 @@ from collections import OrderedDict
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.utils.data import random_split, DataLoader
 from tqdm import tqdm
 from ..models.torch import DenseVAE, DenseAE
 
-class Trainer(object):
+class TorchTrainer(object):
     """
     Class used to train and validate a given model. Currently designed to train VAEs
     """
 
-    def __init__(self, config, trainData, valData, saveNetwork=True):
+    def __init__(self, config, dataset, saveNetwork=True):
 
         # Define class configuration dictionary 
         self.config = config
         self.epochs = self.config["trainer"]["epochs"]
         self.beta   = self.config["trainer"]["beta"]
 
-        # Initialise iterable datasets
-        self.trainData  = trainData
-        self.valData    = valData
+        # Set device 
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        # Initialise datasets
+        self.dataset = dataset
+        self.initialiseDatasets()
 
         # Initialise Networks
         self.initialiseNetwork()
@@ -30,10 +34,7 @@ class Trainer(object):
         self.initialiseOptimiser()
         
         # Initialise loss 
-        self.lossFunction = self.denseVAELoss if self.config["model_name"] == "denseVAE" else None
-
-        # Set device 
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.lossFunction = self.denseVAELoss() if self.config["trainer"]["model_name"] == "denseVAE" else None
 
         # Initialise metric dictionary
         self.metrics = {
@@ -50,9 +51,9 @@ class Trainer(object):
         Initialise network objects
         """
         self.network = None
-        if self.config["model_name"] == "denseVAE":
-            self.network    = DenseVAE(self.config["network"]["input_dims"], self.config["network"]["latent_dims"]) 
-        if self.config["model_name"] == "denseAE":
+        if self.config["trainer"]["model_name"] == "denseVAE":
+            self.network    = DenseVAE(self.config["network"]["input_dims"], self.config["network"]["latent_dims"], self.device) 
+        if self.config["trainer"]["model_name"] == "denseAE":
             self.network    = DenseAE(self.config["network"]["input_dims"], self.config["network"]["latent_dims"]) 
         if self.network is None:
             raise Exception("YOU FUCKED UP")
@@ -61,24 +62,41 @@ class Trainer(object):
         """
         Initialise optimiser network
         """
-        if self.config["optimiser"]["name"] == "adam":
+        if self.config["trainer"]["optimiser"]["name"] == "adam":
             self.optimiser  = optim.Adam(
-               params=self.network.parameters(), lr=self.config["learning_rate"] 
+               params=self.network.parameters(), lr=self.config["trainer"]["learning_rate"] 
             )
         else: 
             optim.SGD(
-                params=self.network.parameters(), lr=self.config["learning_rate"]
+                params=self.network.parameters(), lr=self.config["trainer"]["learning_rate"]
             )
+
+    def initialiseDatasets(self,):
+        # Define data split fractions
+        self.trainData, self.valData = random_split(self.dataset, self.config["trainer"]["train_test_split"])
+        # Define train and val loaders
+        self.trainLoader = DataLoader(
+            self.trainData,
+            batch_size = self.config["dataloader"]["batch_size"],
+            shuffle = True,
+            num_workers = self.config["trainer"]["num_workers"],
+        )
+        self.valLoader = DataLoader(
+            self.valData,
+            batch_size = self.config["dataloader"]["batch_size"],
+            shuffle = True,
+            num_workers = self.config["trainer"]["num_workers"],
+        )
 
     def denseVAELoss(self, xTruth, xGenerated, mean=None, logvar=None):
         """
         Loss function consists of (1-beta)*MSE + beta*KL 
         """
-        l1Loss = nn.L1Loss(xTruth, xGenerated)
+        l1Loss = nn.MSELoss(xTruth, xGenerated)
         # klLoss  = - 0.5 * torch.sum(1+ log_var - mean.pow(2) - log_var.exp())
 
         # return (1-self.beta)*mseLoss + self.beta*klLoss
-        return l1Loss*100 
+        return l1Loss 
 
     def trainStep(self, input):
         """
@@ -134,7 +152,20 @@ class Trainer(object):
         Return metrics object
         """
         return self.metrics
-    
+
+    def getNetwork(self):
+        """
+        Return network object
+        """
+        return self.network
+
+    def saveCheckpoint(self):
+        """
+        Save a copy of the network parameters
+        """
+        savedir = self.config["trainer"]["output_dir"] + "model_" + self.config["trainer"]["run_id"] + ".pt"
+        torch.save(self.network.state_dict(), self.config["trainer"]["output_dir"] + "model_" + self.config )
+
     def runBatchProcess(self,):
         """
         Execute the main training loop
@@ -155,7 +186,7 @@ class Trainer(object):
             # Set network to training mode
             self.network.train()
             # Run train step
-            for input in iter(self.trainData):
+            for input in iter(self.trainLoader):
                 # Send input to device
                 input = input.to(self.device)
                 # Compute iteration metrics
@@ -170,7 +201,7 @@ class Trainer(object):
             # Set model to evaluate mode
             self.network.eval()
             # Run Validation step
-            for input in iter(self.valData):
+            for input in iter(self.valLoader):
                 # Send input to device
                 input = input.to(self.device)
                 # Compute iteration metics
@@ -182,3 +213,7 @@ class Trainer(object):
             self.printResults(epoch+1, valLoss, "Validation")
             # Log metrics
             self.logMetrics(trainLoss, valLoss)
+
+        # Save model 
+        if self.config["trainer"]["save_model"]:
+            self.saveCheckpoint()
