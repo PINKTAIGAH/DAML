@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+import time
 
 class DataLoader(object):
     """
@@ -145,16 +146,13 @@ class DataLoader(object):
         """
         # Make list containing all keys for object names in dataset
         objectKeys = [key for key in self.dataset.columns if "object" in key]
-
-        # Create a dataset containing the number of apperance for each object in an event
-        numObjects = self.dataset[objectKeys].T.apply(pd.Series.value_counts).T.fillna(0).astype(int)
-
+        # Create a dataframe containing all particles in event in the form of a numpy char array 
+        numObjects = self.dataset[objectKeys].to_numpy().astype(str)
         # Iterate over each object we want to count and add to dataset
         for objectType, key in zip(self.particleObjectTypes, self.numParticleKeys):
-            # Copmpute list containing names of particles we want to count 
-            # This is done to count something like mu+ and mu- together
-            particleNameList = [particleName for particleName in numObjects.columns if objectType in particleName]
-            numObject = numObjects[particleNameList].sum(axis=1)
+            # Find number of specific object for each event in dataset
+            numObject = np.count_nonzero( np.char.find(numObjects, objectType)==0 , axis=1)
+            # Insert array into dataset 
             self.dataset.insert(0, key, numObject)
 
         # Drop columns containg object names
@@ -277,3 +275,13 @@ class DataLoader(object):
         Return dataset object
         """
         return self.dataset.to_numpy(dtype=np.float32) if asNumpy else self.dataset
+
+
+def test():
+
+    cwd = "/home/giorgio/DAML/report-2/"
+    dataloader = DataLoader("raw_datasets/background_chan2b_7.8.csv", cwd, 8,)
+    dataset = dataloader.getDataset()
+
+if __name__ == "__main__":
+    test()

@@ -1,5 +1,5 @@
 
-import os
+import os, time
 from collections import OrderedDict
 import torch
 import torch.nn as nn
@@ -13,7 +13,7 @@ class TorchTrainer(object):
     Class used to train and validate a given model. Currently designed to train VAEs
     """
 
-    def __init__(self, config, dataset, saveNetwork=True):
+    def __init__(self, config, dataset,):
 
         # Define class configuration dictionary 
         self.config = config
@@ -34,7 +34,7 @@ class TorchTrainer(object):
         self.initialiseOptimiser()
         
         # Initialise loss 
-        self.lossFunction = self.denseVAELoss() if self.config["trainer"]["model_name"] == "denseVAE" else None
+        self.lossFunction = self.denseVAELoss if self.config["trainer"]["model_name"] == "denseVAE" else None
 
         # Initialise metric dictionary
         self.metrics = {
@@ -92,11 +92,11 @@ class TorchTrainer(object):
         """
         Loss function consists of (1-beta)*MSE + beta*KL 
         """
-        l1Loss = nn.MSELoss(xTruth, xGenerated)
+        l1Loss = nn.functional.mse_loss(xTruth, xGenerated)
         # klLoss  = - 0.5 * torch.sum(1+ log_var - mean.pow(2) - log_var.exp())
 
         # return (1-self.beta)*mseLoss + self.beta*klLoss
-        return l1Loss 
+        return l1Loss*100 
 
     def trainStep(self, input):
         """
@@ -105,10 +105,15 @@ class TorchTrainer(object):
         # Flush gradients
         self.optimiser.zero_grad()
 
-        # Perform forward step
-        output = self.network(input)
-        # Compute loss function
-        loss = self.lossFunction(input, output)
+        if self.config["trainer"]["model_name"] == "denseVAE":
+            output, mean, logvar = self.network(input)
+            # Compute loss function
+            loss = self.lossFunction(input, output)
+        else:
+            output = self.network(input)
+            # Compute loss function
+            loss = self.lossFunction(input, output)
+
         
         # Preform backwards step
         loss.backward()
@@ -125,11 +130,15 @@ class TorchTrainer(object):
         with torch.no_grad():
             # Perform validation step
             # Compute network output
-            output = self.network(input)
+            if self.config["trainer"]["model_name"] == "denseVAE":
+                output, mean, logvar = self.network(input)
+                # Compute loss function
+                loss = self.lossFunction(input, output)
+            else:
+                output = self.network(input)
+                # Compute loss function
+                loss = self.lossFunction(input, output)
 
-            # Compute loss function
-            loss = self.lossFunction(input, output)
-            # print(loss)
         return loss
     
     def printResults(self, epoch, loss, mode):
@@ -163,8 +172,8 @@ class TorchTrainer(object):
         """
         Save a copy of the network parameters
         """
-        savedir = self.config["trainer"]["output_dir"] + "model_" + self.config["trainer"]["run_id"] + ".pt"
-        torch.save(self.network.state_dict(), self.config["trainer"]["output_dir"] + "model_" + self.config )
+        savedir = str(self.config["trainer"]["output_dir"]) + "model_" + str(self.config["trainer"]["run_id"]) + ".pt"
+        torch.save(self.network.state_dict(), savedir )
 
     def runBatchProcess(self,):
         """
@@ -173,6 +182,8 @@ class TorchTrainer(object):
 
         # Send network to device
         self.network = self.network.to(self.device)
+        # Save training start time
+        self.trainingStartTime = time.time() 
 
         # Iterate per epoch
         for epoch in range(self.epochs):
@@ -217,3 +228,6 @@ class TorchTrainer(object):
         # Save model 
         if self.config["trainer"]["save_model"]:
             self.saveCheckpoint()
+
+        # Print out global training time
+        print(f"Time taken to train: \t {(time.time()-self.trainingStartTime):.3f} s")

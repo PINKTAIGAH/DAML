@@ -34,8 +34,7 @@ dataloader:
 
 # Confuguration settings for trainer
 trainer:
-  save_model      : True
-  device          : cuda
+  save_model      : False
   run_id          : test_run
   output_dir      : outputs/
   model_name      : denseVAE
