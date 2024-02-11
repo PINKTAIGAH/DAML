@@ -6,3 +6,6 @@ pyarrow
 seaborn
 scikit-learn
 tensorboard
+torch 
+torchvision 
+torchaudio

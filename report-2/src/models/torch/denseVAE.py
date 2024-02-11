@@ -20,10 +20,10 @@ class DenseVAE(nn.Module):
         self.encoder = nn.Sequential(
             # First dense block
             nn.Linear(self.inputDims, featureDims),
-            nn.LeakyReLU(0.2) if activation=="leaky" else nn.ReLU(),
+            nn.LeakyReLU(0.2) if activation=="leaky" else nn.GELU(),
             # Second dense block
             nn.Linear(featureDims, int(featureDims/2)),
-            nn.LeakyReLU(0.2) if activation=="leaky" else nn.ReLU(),
+            nn.LeakyReLU(0.2) if activation=="leaky" else nn.GELU(),
             # Third dense layer w/ output being latent dims. This block will have no activation func
             nn.Linear(int(featureDims/2), self.latentDims),
         )
@@ -36,13 +36,13 @@ class DenseVAE(nn.Module):
         self.decoder = nn.Sequential(
             # Take z to latent dim
             nn.Linear(2, self.latentDims),
-            nn.LeakyReLU(0.2) if activation=="leaky" else nn.ReLU(),
+            nn.LeakyReLU(0.2) if activation=="leaky" else nn.GELU(),
             # First dense block
             nn.Linear(self.latentDims, int(featureDims/2),),
-            nn.LeakyReLU(0.2) if activation=="leaky" else nn.ReLU(),
+            nn.LeakyReLU(0.2) if activation=="leaky" else nn.GELU(),
             # Second dense block
             nn.Linear(int(featureDims/2), featureDims,),
-            nn.LeakyReLU(0.2) if activation=="leaky" else nn.ReLU(),
+            nn.LeakyReLU(0.2) if activation=="leaky" else nn.GELU(),
             # Third dense layer w/ output being latent dims. This block will have no activation func
             nn.Linear(featureDims, self.inputDims,),
         )
@@ -70,7 +70,7 @@ class DenseVAE(nn.Module):
         """
         logits = self.decoder(z)
         if apply_sigmoid:
-            probs = nn.Sigmoid(logits)
+            probs = nn.functional.sigmoid(logits)
             return probs
         return logits
 

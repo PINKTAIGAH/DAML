@@ -46,17 +46,25 @@ class TorchTrainer(object):
             }
         }
 
+    def _init_weights(self, m):
+        if isinstance(m, nn.Linear):
+            torch.nn.init.xavier_uniform_(m.weight)
+            m.bias.data.fill_(0.01)
+
     def initialiseNetwork(self,):
         """
         Initialise network objects
         """
         self.network = None
         if self.config["trainer"]["model_name"] == "denseVAE":
-            self.network    = DenseVAE(self.config["network"]["input_dims"], self.config["network"]["latent_dims"], self.device) 
+            self.network    = DenseVAE(self.config["network"]["input_dims"], self.config["network"]["latent_dims"], self.device,) 
         if self.config["trainer"]["model_name"] == "denseAE":
             self.network    = DenseAE(self.config["network"]["input_dims"], self.config["network"]["latent_dims"]) 
         if self.network is None:
             raise Exception("YOU FUCKED UP")
+
+        # Randomise weights
+        self.network.apply(self._init_weights)
 
     def initialiseOptimiser(self,):
         """
@@ -92,11 +100,12 @@ class TorchTrainer(object):
         """
         Loss function consists of (1-beta)*MSE + beta*KL 
         """
-        l1Loss = nn.functional.mse_loss(xTruth, xGenerated)
-        # klLoss  = - 0.5 * torch.sum(1+ log_var - mean.pow(2) - log_var.exp())
+        l2Loss = nn.functional.mse_loss(xTruth, xGenerated)
+        klLoss  = - 0.5 * torch.sum(1+ logvar - mean.pow(2) - logvar.exp())
 
         # return (1-self.beta)*mseLoss + self.beta*klLoss
-        return l1Loss*100 
+        #return (1-self.config["trainer"]["beta"])*l2Loss + self.config["trainer"]["beta"]*klLoss
+        return l2Loss * 100
 
     def trainStep(self, input):
         """
@@ -108,7 +117,7 @@ class TorchTrainer(object):
         if self.config["trainer"]["model_name"] == "denseVAE":
             output, mean, logvar = self.network(input)
             # Compute loss function
-            loss = self.lossFunction(input, output)
+            loss = self.lossFunction(input, output, mean, logvar)
         else:
             output = self.network(input)
             # Compute loss function
@@ -133,7 +142,7 @@ class TorchTrainer(object):
             if self.config["trainer"]["model_name"] == "denseVAE":
                 output, mean, logvar = self.network(input)
                 # Compute loss function
-                loss = self.lossFunction(input, output)
+                loss = self.lossFunction(input, output, mean, logvar)
             else:
                 output = self.network(input)
                 # Compute loss function

@@ -38,10 +38,10 @@ trainer:
   run_id          : test_run
   output_dir      : outputs/
   model_name      : denseVAE
-  epochs          : 30
+  epochs          : 40
   learning_rate   : 0.001
-  beta            : 1
-  num_workers     : 1
+  beta            : 0.8
+  num_workers     : 4
   train_test_split: 
     - 0.8
     - 0.2
