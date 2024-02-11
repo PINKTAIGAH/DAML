@@ -34,7 +34,7 @@ class TorchTrainer(object):
         self.initialiseOptimiser()
         
         # Initialise loss 
-        self.lossFunction = self.denseVAELoss if self.config["trainer"]["model_name"] == "denseVAE" else None
+        self.lossFunction = self.denseVAELoss 
 
         # Initialise metric dictionary
         self.metrics = {
@@ -101,11 +101,11 @@ class TorchTrainer(object):
         Loss function consists of (1-beta)*MSE + beta*KL 
         """
         l2Loss = nn.functional.mse_loss(xTruth, xGenerated)
-        klLoss  = - 0.5 * torch.sum(1+ logvar - mean.pow(2) - logvar.exp())
+        # klLoss  = - 0.5 * torch.sum(1+ logvar - mean.pow(2) - logvar.exp())
 
         # return (1-self.beta)*mseLoss + self.beta*klLoss
         #return (1-self.config["trainer"]["beta"])*l2Loss + self.config["trainer"]["beta"]*klLoss
-        return l2Loss * 100
+        return l2Loss 
 
     def trainStep(self, input):
         """

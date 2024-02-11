@@ -5,7 +5,7 @@ jupyter:
 # Configuration settings for model
 network:
   input_dims    : 39
-  latent_dims   : 3
+  latent_dims   : 10
   activation    : leaky
   feature_dims  : 32
 
@@ -37,8 +37,8 @@ trainer:
   save_model      : False
   run_id          : test_run
   output_dir      : outputs/
-  model_name      : denseVAE
-  epochs          : 40
+  model_name      : denseAE
+  epochs          : 80
   learning_rate   : 0.001
   beta            : 0.8
   num_workers     : 4
