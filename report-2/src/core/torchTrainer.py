@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import random_split, DataLoader
 from tqdm import tqdm
-from ..models.torch import DenseVAE, DenseAE
+from ..models import DenseVAE, DenseAE
 
 class TorchTrainer(object):
     """
@@ -34,7 +34,7 @@ class TorchTrainer(object):
         self.initialiseOptimiser()
         
         # Initialise loss 
-        self.lossFunction = self.denseVAELoss 
+        self.criterion = self.lossFunction
 
         # Initialise metric dictionary
         self.metrics = {
@@ -96,16 +96,12 @@ class TorchTrainer(object):
             num_workers = self.config["trainer"]["num_workers"],
         )
 
-    def denseVAELoss(self, xTruth, xGenerated, mean=None, logvar=None):
+    def lossFunction(self, xTruth, xGenerated, mean=None, logvar=None):
         """
         Loss function consists of (1-beta)*MSE + beta*KL 
         """
-        l2Loss = nn.functional.mse_loss(xTruth, xGenerated)
-        # klLoss  = - 0.5 * torch.sum(1+ logvar - mean.pow(2) - logvar.exp())
-
-        # return (1-self.beta)*mseLoss + self.beta*klLoss
-        #return (1-self.config["trainer"]["beta"])*l2Loss + self.config["trainer"]["beta"]*klLoss
-        return l2Loss 
+        mse_Loss = nn.functional.mse_loss(xTruth, xGenerated)
+        return mse_Loss 
 
     def trainStep(self, input):
         """
@@ -121,8 +117,7 @@ class TorchTrainer(object):
         else:
             output = self.network(input)
             # Compute loss function
-            loss = self.lossFunction(input, output)
-
+            loss = self.criterion(input, output)
         
         # Preform backwards step
         loss.backward()
@@ -146,7 +141,7 @@ class TorchTrainer(object):
             else:
                 output = self.network(input)
                 # Compute loss function
-                loss = self.lossFunction(input, output)
+                loss = self.criterion(input, output)
 
         return loss
     
@@ -176,6 +171,12 @@ class TorchTrainer(object):
         Return network object
         """
         return self.network
+
+    def getSplitDataClasses(self,):
+        """
+        Return the training and validation dataclasses
+        """
+        return self.trainData, self.valData
 
     def saveCheckpoint(self):
         """

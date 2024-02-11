@@ -2,7 +2,7 @@ import os
 from collections import OrderedDict
 import tensorflow as tf
 from tqdm import tqdm
-from ..models.tensorflow import DenseVAE, DenseAE
+from . import DenseVAE, DenseAE
 from tensorflow.keras.metrics import mean_squared_error as MSE, kl_divergence as KL
 
 # Trun of tensorflow warnings
@@ -70,9 +70,6 @@ class TensorflowTrainer(object):
         Loss function consists of (1-beta)*MSE + beta*KL 
         """
         mseLoss = MSE(xTruth, xGenerated)
-        klLoss  = KL(xTruth, xGenerated)
-
-        # return (1-self.beta)*mseLoss + self.beta*klLoss
         return mseLoss*100 
 
     def trainStep(self, input):

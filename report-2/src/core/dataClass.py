@@ -1,23 +1,22 @@
 import torch
 import numpy as np
-from .dataLoader import DataLoader
+from .dataReader import DataReader
 from torch.utils.data.dataset import Dataset
 import torchvision as tv
 
-class Dataclass(Dataset):
+class DataClass(Dataset):
 
     def __init__(self, data_dir, cwd, numParticles, loadProcessed=False, saveProcessed=False,):
         super().__init__()
 
         # Load in dataset
-        dataLoader = DataLoader(data_dir, cwd, numParticles, loadProcessed=loadProcessed, saveProcessed=saveProcessed)
-        dataset = dataLoader.getDataset(asNumpy=True)
+        dataReader = DataReader(data_dir, cwd, numParticles, loadProcessed=loadProcessed, saveProcessed=saveProcessed)
+        dataset = dataReader.getDataset(asNumpy=True)
 
         # Apply transformations to dataloader
         dataset = self.scale_dataset(dataset)
         self.dataset = torch.from_numpy(dataset).to(torch.float32)
 
-        print(self.dataset.shape)
 
     def scale_dataset(self, dataset, scaled_min=-1, scaled_max=1,):
         """
@@ -46,8 +45,10 @@ class Dataclass(Dataset):
         """
         Return a new data point in dataset
         """  
-
         return self.dataset[idx]
 
     def __len__(self):
+        """
+        Return the number of events in the dataset
+        """
         return self.dataset.shape[0]

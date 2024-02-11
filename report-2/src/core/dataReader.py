@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import time
 
-class DataLoader(object):
+class DataReader(object):
     """
     This is a class used to read raw csv files and return a well formatted numpy array containing all the numerical data to be used 
     for training. For more info, read main jupyter notebook.
@@ -222,10 +222,8 @@ class DataLoader(object):
         """
         # Read and parse CSV
         self.readCsv()
-        print("csv read")
         # Parse and process event kinematics
         self.processKinematics()
-        print("kinematics processed")
         # Build list of keys from dataset which will have logs calculated 
         logKeys = []
         logKeys.extend([energy_key for energy_key in self.dataset.columns if "energy" in energy_key])
@@ -233,10 +231,8 @@ class DataLoader(object):
         logKeys.extend([met_key for met_key in self.dataset.columns if "met" == met_key])
         # Take log of logKeys columns
         self._takeColumnLogs(logKeys)
-        print("logs taken")
-        # COnpute number of objects in each event
+        # Compute number of objects in each event
         self._computeNumObjects()
-        print("num objects computed")
 
     def loadProcessedDataset(self):
         """
@@ -280,7 +276,7 @@ class DataLoader(object):
 def test():
 
     cwd = "/home/giorgio/DAML/report-2/"
-    dataloader = DataLoader("raw_datasets/background_chan2b_7.8.csv", cwd, 8,)
+    dataloader = DataReader("raw_datasets/background_chan2b_7.8.csv", cwd, 8,)
     dataset = dataloader.getDataset()
 
 if __name__ == "__main__":

@@ -1,4 +1,3 @@
-from .dataLoader import DataLoader
-# from .tensorflowTrainer import TensorflowTrainer
+from .dataReader import DataReader
 from .torchTrainer import TorchTrainer
-from .dataclass import Dataclass
+from .dataClass import DataClass
