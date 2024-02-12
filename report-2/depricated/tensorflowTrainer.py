@@ -1,7 +1,6 @@
 import os
 from collections import OrderedDict
 import tensorflow as tf
-from tqdm import tqdm
 from . import DenseVAE, DenseAE
 from tensorflow.keras.metrics import mean_squared_error as MSE, kl_divergence as KL
 

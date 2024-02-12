@@ -5,7 +5,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import random_split, DataLoader
-from tqdm import tqdm
 from ..models import DenseVAE, DenseAE
 
 class TorchTrainer(object):
