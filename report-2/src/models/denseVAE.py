@@ -10,7 +10,7 @@ class DenseVAE(nn.Module):
     def __init__(self, inputDims, latentDims, device, featureDims=32, activation="leaky"):
         
         # Initialise parent class
-        super().__init__()
+        super(DenseVAE, self).__init__()
         # Define device 
         self.device = device
         # Define class parameters

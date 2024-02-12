@@ -89,4 +89,4 @@ def false_positive_rate(sm_scores, bsm_scores,):
     # Compute number of sm events incorrectly classified as bsm
     count = (sm_scores>bsm_minimum).sum()
     # Return percentage of sm events incorrectly classified
-    return (count/sm_scores.size)
+    return (count/sm_scores.size), bsm_minimum

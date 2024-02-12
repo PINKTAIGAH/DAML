@@ -10,7 +10,7 @@ class DenseAE(nn.Module):
     def __init__(self, inputDims, latentDims, featureDims=32, activation="leaky"):
         
         # Initialise parent class
-        super().__init__()
+        super(DenseAE, self).__init__()
         # Define class parameters
         self.latentDims = latentDims
         self.inputDims  = inputDims

@@ -46,7 +46,14 @@ class TorchTrainer(object):
             }
         }
 
+        # # Initialise objects for weight regularization
+        # self.l1_penalty = nn.L1Loss(size_average=False)
+        # self.regularisationLambda = 0.5
+
     def _init_weights(self, m):
+        """
+        Ranomise the weights of a model which is passed through the function
+        """
         if isinstance(m, nn.Linear):
             torch.nn.init.xavier_uniform_(m.weight)
             m.bias.data.fill_(0.01)
@@ -75,7 +82,7 @@ class TorchTrainer(object):
                params=self.network.parameters(), lr=self.config["trainer"]["learning_rate"] 
             )
         else: 
-            optim.SGD(
+            self.optimiser = optim.SGD(
                 params=self.network.parameters(), lr=self.config["trainer"]["learning_rate"]
             )
 
@@ -100,8 +107,8 @@ class TorchTrainer(object):
         """
         Loss function consists of (1-beta)*MSE + beta*KL 
         """
-        mse_Loss = nn.functional.mse_loss(xTruth, xGenerated)
-        return mse_Loss 
+        mse_loss = nn.functional.mse_loss(xTruth, xGenerated)
+        return mse_loss 
 
     def trainStep(self, input):
         """
@@ -118,7 +125,12 @@ class TorchTrainer(object):
             output = self.network(input)
             # Compute loss function
             loss = self.criterion(input, output)
-        
+            # # Add l1 regularisation for each linear layer
+            # regularisation_loss = torch.tensor(0.0).to(self.device)
+            # for param in self.network.parameters():
+            #     regularisation_loss += torch.norm(param, 1)**2
+            # loss += self.regularisationLambda * regularisation_loss
+
         # Preform backwards step
         loss.backward()
         self.optimiser.step()
@@ -142,6 +154,11 @@ class TorchTrainer(object):
                 output = self.network(input)
                 # Compute loss function
                 loss = self.criterion(input, output)
+                # # Add l1 regularisation for each linear layer
+                # regularisation_loss = torch.tensor(0.0).to(self.device)
+                # for param in self.network.parameters():
+                #     regularisation_loss += torch.norm(param, 1)**2
+                # loss += self.regularisationLambda * regularisation_loss
 
         return loss
     

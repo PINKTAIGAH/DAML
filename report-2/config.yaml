@@ -5,7 +5,7 @@ jupyter:
 # Configuration settings for model
 network:
   input_dims    : 39
-  latent_dims   : 10
+  latent_dims   : 12
   activation    : leaky
   feature_dims  : 32
 
@@ -13,7 +13,7 @@ network:
 dataloader:
   maximum_particles : 8
   load_dataset      : False
-  save_dataset      : True
+  save_dataset      : False
   batch_size        : 256
   raw_datasets      : 
     chargino_chargino :
@@ -38,7 +38,7 @@ trainer:
   run_id          : test_run
   output_dir      : outputs/
   model_name      : denseAE
-  epochs          : 80
+  epochs          : 60
   learning_rate   : 0.001
   beta            : 0.8
   num_workers     : 4
