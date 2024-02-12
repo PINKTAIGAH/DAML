@@ -1,6 +1,6 @@
 # Configuration settings for the operation of jupyter notebook
 jupyter:
-  run_cli: False
+  run_cli: True
 
 # Configuration settings for model
 network:
