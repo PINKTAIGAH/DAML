@@ -4,5 +4,6 @@
 /gun/energy 300 MeV
 /run/beamOn 0
 /vis/scene/notifyHandlers scene-0
-/run/beamOn 20
-/run/dumpCouples
+/gun/energy 300 MeV
+/gun/particle neutron
+/run/beamOn 100
