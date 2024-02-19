@@ -1,6 +1,7 @@
 #include "EnergyCounter.h"
 
-#include "g4csv.hh"
+// #include "g4csv.hh"
+#include "G4CsvAnalysisManager.hh"
 
 EnergyCounter::EnergyCounter( const G4String& name, const G4int id )
   : G4VSensitiveDetector( name ) // Run the constructor of the parent class
@@ -38,7 +39,8 @@ void EnergyCounter::EndOfEvent( G4HCofThisEvent* )
   G4cout << this->GetName() << " total energy = " << m_totalEnergy << G4endl;
 
   // Get the analysis manager
-  auto analysisManager = G4AnalysisManager::Instance();
+  // auto analysisManager = G4AnalysisManager::Instance();
+  auto analysisManager = G4CsvAnalysisManager::Instance();
 
   // Fill histogram (histogram 0, bin by layer ID)
   analysisManager->FillH1( 0, m_ID, m_totalEnergy );

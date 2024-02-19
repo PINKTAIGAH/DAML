@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 # Define dirtectory for data files
@@ -16,40 +17,31 @@ NEUTRON_DATA = {
 INIT_ENERGY = 300.0   # MeV
 DETECTOR_LAYERS = 6
 
-# Import ntuple files and take mean energy of all particles
-energy_data = {
-    "electron"  : np.loadtxt(ELECTRON_DATA["nTuple"], delimiter=",", comments="#").T.mean(axis=1),
-    "neutron"   : np.loadtxt(NEUTRON_DATA["nTuple"], delimiter=",", comments="#").T.mean(axis=1),
-}
-
 # Build a list containing the detector's components
 detector_components = []
 for idx in range(DETECTOR_LAYERS):
     if idx == 0:
-        detector_components.append("init")
+        detector_components.append("true")
     else:
         detector_components.append(f"layer {idx}")
 
+# Import ntuple files and take mean energy of all particles
+energy_data = {
+    "electron"  : pd.read_csv(ELECTRON_DATA["nTuple"],  comment="#", names=detector_components),
+    "neutron"   : pd.read_csv(NEUTRON_DATA["nTuple"], comment="#", names=detector_components),
+}
+
 #### PLOT THE ENERGY DISTRIBUTIONS #### 
-colors = ("maroon", "darkblue")
+fig, ax = plt.subplots(1, 2)
 
-x = np.arange(len(detector_components))  # the label locations
-width = 0.35  # the width of the bars
-multiplier = 0
+for idx, key in enumerate(energy_data.keys()):
+    ax[idx].hist(energy_data[key], 20, label=detector_components, stacked=True)
+    ax[idx].set(
+        xlabel  = "Energy (MeV)",
+        ylabel  = "Entries",
+        title   = "key",
+    )
 
-fig, ax = plt.subplots()
-
-# Plot each dataset on the axes
-for idx, (key, energy) in enumerate(energy_data.items()):
-    offset = width * multiplier
-    rects = ax.bar(x + offset, energy, width, label=key, alpha=0.5, color=colors[idx])
-    # ax.bar_label(rects, padding=3)
-    multiplier += 1
-
-# Add some text for labels, title and custom x-axis tick labels, etc.
-ax.set_ylabel('Average Energy (MeV)')
-ax.set_title('Average energy distribution in detector layers', y=1.03, fontsize="14")
-ax.set_xticks(x)
-ax.set_xticklabels(detector_components)
-ax.legend(loc='upper right')
+fig.suptitle("MC Energy in each detector layer")
+fig.savefig("../images/detector_energy_hist.png")
 plt.show()

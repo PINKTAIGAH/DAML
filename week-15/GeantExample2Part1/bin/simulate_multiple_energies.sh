@@ -1,4 +1,4 @@
-ENERGY_RANGE=($(seq 10000 100 100000))
+ENERGY_RANGE=($(seq 10000 5000 100000))
 
 for i in ${ENERGY_RANGE[@]}; do
     > ./run.mac

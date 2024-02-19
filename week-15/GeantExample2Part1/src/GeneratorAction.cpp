@@ -2,7 +2,8 @@
 
 #include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
-#include "g4csv.hh"
+// #include "g4csv.hh"
+#include "G4CsvAnalysisManager.hh"
 
 GeneratorAction::GeneratorAction() : G4VUserPrimaryGeneratorAction()
 {
@@ -29,7 +30,7 @@ void GeneratorAction::GeneratePrimaries( G4Event* anEvent )
   m_particleGun->GeneratePrimaryVertex( anEvent );
 
   // Store truth information - first column
-  auto analysisManager = G4AnalysisManager::Instance();
+  auto analysisManager = G4CsvAnalysisManager::Instance();
   G4double particleEnergy = m_particleGun->GetParticleEnergy();
   analysisManager->FillNtupleDColumn( 0, 0, particleEnergy );
 }
