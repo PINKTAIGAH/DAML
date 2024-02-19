@@ -43,4 +43,4 @@
 #     /process/inactivate eBrem
 #
 # Don't forget to re-run the experiment after the changes!
-#     /run/beamOn 20
+/run/beamOn 20

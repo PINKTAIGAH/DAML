@@ -20,11 +20,10 @@ def compute_energy_difference(filename, detector_components):
     # obtain the energy resolution
     energy_difference = (electron_calibrated_energies - electron_energy["truth"]) / electron_energy["truth"]
 
-    return energy_difference
+    return energy_difference, electron_energy["truth"]
 
 # Define global parameters
 DATA_DIRECTORY  = "./data/2d_hist_data/"
-ENERGY_RANGE    = [10000 + increment for increment in range(0, 95000, 5000)]
 DETECTOR_LAYERS = 6
 
 # Build a list containing the detector's components
@@ -35,20 +34,10 @@ for idx in range(DETECTOR_LAYERS):
     else:
         detector_components.append(f"layer {idx}")
 
-# Make list containing the filename of each data file
-filenames = [DATA_DIRECTORY + "electron_" + str(energy) + "mev_1000.csv" for energy in ENERGY_RANGE]
 
+energy_differences, true_energies = compute_energy_difference(DATA_DIRECTORY+"output_nt_Energy.csv", detector_components)
 
-energy_differences = []
-true_energies = []
-for idx, filename in enumerate(filenames):
-    energy_difference = compute_energy_difference(filename, detector_components)
-    true_energy = np.full_like(energy_difference, ENERGY_RANGE[idx])
-    
-    energy_differences.extend(list(energy_difference))
-    true_energies.extend(list(true_energy))
-
-plt.hist2d(true_energies, energy_differences, bins=(20, 80))
+plt.hist2d(true_energies, energy_differences, bins=(80, 100))
 plt.ylabel(r"$\frac{E_{cal} - E_{MC}}{E_{MC}}$")
 plt.xlabel("Energy (MeV)")
 plt.title("Detector resolution distribution at different particle energies")

@@ -38,6 +38,8 @@ electron_calibrated_energies = electron_energy["detected"] * electron_calibratio
 # obtain the energy resolution
 electron_energy["resolution"] = (electron_calibrated_energies - electron_energy["truth"]) / electron_energy["truth"]
 
+print(f"The energy resolution of this detector is {electron_energy['resolution'].std():.3f}")
+
 #### PLOT THE CALIBRATION ####
 plt.hist(electron_energy["resolution"], bins=50, histtype="step", color="maroon", label=r"e$^-$")
 plt.xlabel(r"$\frac{E_{cal} - E_{MC}}{E_{MC}}$")
