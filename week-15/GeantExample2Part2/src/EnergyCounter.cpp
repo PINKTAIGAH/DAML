@@ -17,6 +17,7 @@ EnergyCounter::~EnergyCounter()
 void EnergyCounter::Initialize( G4HCofThisEvent* )
 {
   m_totalEnergy = 0.0;
+  m_electronEnergy = 0.0;
 }
 
 // Analyse anything that hits the detector
@@ -27,6 +28,14 @@ G4bool EnergyCounter::ProcessHits( G4Step* step, G4TouchableHistory* )
 
   // Add to the total energy in this object
   m_totalEnergy += edep;
+
+  // Find particle name of track 
+  std::string particle = step->GetTrack()->GetParticleDefinition()->GetParticleName();
+  
+  // Add the energy to electronEnergy if particle in track is electron
+  if (particle=="e-"){
+    m_electronEnergy += edep;
+  }
 
   return true;
 }
@@ -42,4 +51,5 @@ void EnergyCounter::EndOfEvent( G4HCofThisEvent* )
 
   // Fill ntuple (it's always ntuple 0, column by layer ID)
   analysisManager->FillNtupleDColumn( 0, m_ID, m_totalEnergy );
+  analysisManager->FillNtupleDColumn( 0, m_ID+5, m_electronEnergy);
 }

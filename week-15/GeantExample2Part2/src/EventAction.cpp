@@ -16,6 +16,7 @@ void EventAction::BeginOfEventAction( const G4Event* )
   m_graphEdges.clear();
   m_bremPhotons.clear();
   m_allParticles.clear();
+  m_conversionPositrons.clear();
 }
 
 void EventAction::EndOfEventAction( const G4Event* )
@@ -31,8 +32,11 @@ void EventAction::EndOfEventAction( const G4Event* )
   //}
 
   // Print particle totals
+  std::cout << "\t##### New Event #####\t" << std::endl;
   std::cout << "Total particles in the event: " << m_allParticles.size() << std::endl;
   std::cout << "Photons produced from electron Bremsstrahlung: " << m_bremPhotons.size() << std::endl;
+  std::cout << "Number of positrons produced from photon conversion: " << m_conversionPositrons.size() << std::endl;
+  std::cout << std::endl;
 }
 
 void EventAction::RecordParticleData( const G4Step* step )
@@ -54,6 +58,18 @@ void EventAction::RecordParticleData( const G4Step* step )
       // Use a set so that track IDs are only stored once
       m_bremPhotons.insert( track->GetTrackID() );
     }
+  }
+
+  // Check if the creation process of the track is due to conversion and is a positron
+  if (track->GetCreatorProcess()){
+    // Get string with creation process
+    std::string creator = track->GetCreatorProcess()->GetProcessName();
+
+    // Append trackID if creator is conversion and particle is positron
+    if (creator=="conv" && particle=="e+"){
+      // Apprnd track ID to set
+      m_conversionPositrons.insert(track->GetTrackID());
+    } 
   }
 
   // Collect all unique particle IDs

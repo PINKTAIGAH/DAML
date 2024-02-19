@@ -23,6 +23,7 @@ class EventAction : public G4UserEventAction
     std::set< std::pair< int, int > > m_graphEdges;
     std::set< int > m_bremPhotons;
     std::set< int > m_allParticles;
+    std::set<int> m_conversionPositrons;
 };
 
 #endif

@@ -1,7 +1,6 @@
 #include "RunAction.h"
 
-// #include "g4csv.hh"
-#include "G4CsvAnalysisManager.hh"
+#include "g4csv.hh"
 
 RunAction::RunAction() : G4UserRunAction()
 {
@@ -9,7 +8,7 @@ RunAction::RunAction() : G4UserRunAction()
   G4int const layerNumber = 5;
 
   // Create analysis manager
-  auto analysisManager = G4CsvAnalysisManager::Instance();
+  auto analysisManager = G4AnalysisManager::Instance();
 
   // Create histogram of energy distribution
   analysisManager->CreateH1( "LayerTotal", "Layer total energy", layerNumber, 0.5, 0.5 + float( layerNumber ) ); // id 0
@@ -31,13 +30,13 @@ RunAction::RunAction() : G4UserRunAction()
 RunAction::~RunAction()
 {
   // Delete analysis manager
-  delete G4CsvAnalysisManager::Instance();
+  delete G4AnalysisManager::Instance();
 }
 
 void RunAction::BeginOfRunAction( const G4Run* )
 {
   // Get analysis manager
-  auto analysisManager = G4CsvAnalysisManager::Instance();
+  auto analysisManager = G4AnalysisManager::Instance();
 
   // Open an output file
   analysisManager->OpenFile( "output.csv" );
@@ -46,7 +45,7 @@ void RunAction::BeginOfRunAction( const G4Run* )
 void RunAction::EndOfRunAction( const G4Run* )
 {
   // Get analysis manager
-  auto analysisManager = G4CsvAnalysisManager::Instance();
+  auto analysisManager = G4AnalysisManager::Instance();
 
   // Save output data
   analysisManager->Write();

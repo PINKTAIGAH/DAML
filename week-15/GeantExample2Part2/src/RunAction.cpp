@@ -22,10 +22,20 @@ RunAction::RunAction() : G4UserRunAction()
   for ( unsigned int layerIndex = 1; layerIndex <= layerNumber; ++layerIndex )
   {
     std::string columnName = "Layer" + std::to_string( layerIndex );
-    analysisManager->CreateNtupleDColumn( columnName );
+    analysisManager->CreateNtupleDColumn( columnName + "Electron deposited energy");
   }
   analysisManager->FinishNtuple();
+
+  // Add electron energies to ntuple
+  for (unsigned int layerIndex = 1; layerIndex <= layerNumber; ++layerIndex){
+    std::string columnName = "Layer" + std::to_string(layerIndex);
+    analysisManager->CreateNtupleDColumn(columnName);
+  }
+
+  analysisManager->FinishNtuple();
 }
+
+
 
 RunAction::~RunAction()
 {

@@ -1,3 +1,0 @@
-/home/giorgio/Github/DAML/week-15/GeantExample2Part1/build/CMakeFiles/MyProgram.dir
-/home/giorgio/Github/DAML/week-15/GeantExample2Part1/build/CMakeFiles/edit_cache.dir
-/home/giorgio/Github/DAML/week-15/GeantExample2Part1/build/CMakeFiles/rebuild_cache.dir

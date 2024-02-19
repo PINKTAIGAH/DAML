@@ -15,6 +15,7 @@ class EnergyCounter : public G4VSensitiveDetector
 
   private:
     G4double m_totalEnergy;
+    G4double m_electronEnergy;
     G4int m_ID;
 };
 

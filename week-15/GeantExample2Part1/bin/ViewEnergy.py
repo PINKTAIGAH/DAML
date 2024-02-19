@@ -32,16 +32,16 @@ energy_data = {
 }
 
 #### PLOT THE ENERGY DISTRIBUTIONS #### 
-fig, ax = plt.subplots(1, 2)
+fig, ax = plt.subplots(1, 2, squeeze=True, sharey=True)
 
 for idx, key in enumerate(energy_data.keys()):
-    ax[idx].hist(energy_data[key], 20, label=detector_components, stacked=True)
+    ax[idx].hist(energy_data[key].T, 10, label=detector_components, stacked=True)
     ax[idx].set(
         xlabel  = "Energy (MeV)",
         ylabel  = "Entries",
-        title   = "key",
+        title   = key,
     )
-
+    ax[idx].legend()
 fig.suptitle("MC Energy in each detector layer")
 fig.savefig("../images/detector_energy_hist.png")
 plt.show()

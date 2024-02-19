@@ -25,6 +25,8 @@ GeneratorAction::~GeneratorAction()
 void GeneratorAction::GeneratePrimaries( G4Event* anEvent )
 {
   // Fire a particle
+  G4double particleEnergy = m_particleGun->GetParticleEnergy();
+  m_particleGun->SetParticleEnergy(particleEnergy + 100.0*MeV);
   m_particleGun->GeneratePrimaryVertex( anEvent );
 
   // Store truth information - first column
