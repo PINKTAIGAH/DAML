@@ -1,9 +1,4 @@
-/globalField/verbose 1
-/globalField/setValue 0 0 0 tesla
 /gun/particle e-
-/gun/energy 300 MeV
+/gun/energy 10000 MeV
 /run/beamOn 0
-/vis/scene/notifyHandlers scene-0
-/gun/energy 300 MeV
-/gun/particle neutron
-/run/beamOn 100
+/run/beamOn 1000

@@ -34,14 +34,14 @@ int main( int argc, char* argv[] )
   runManager->SetUserInitialization( new ActionInitialization() );
 
   // Set up display
-  G4VisManager* visManager = new G4VisExecutive();
-  visManager->Initialize();
+  // G4VisManager* visManager = new G4VisExecutive();
+  // visManager->Initialize();
 
   // Set up the command line interface
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
   UImanager->ApplyCommand( "/control/execute vis.mac" );
   UImanager->ApplyCommand( "/control/execute run.mac" );
-  ui->SessionStart();
+  // ui->SessionStart();
   delete ui;
 
   // Job termination
@@ -49,6 +49,6 @@ int main( int argc, char* argv[] )
   // owned and deleted by the run manager, so they should not be deleted
   // in the main() program !
   //
-  delete visManager;
+  // delete visManager;
   delete runManager;
 }

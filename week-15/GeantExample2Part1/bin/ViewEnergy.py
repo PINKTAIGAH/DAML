@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 
 # Define dirtectory for data files
 ELECTRON_DATA = {
-    "histogram"     : "./data/electron_20/output_h1_LayerTotal.csv",
-    "nTuple"        : "./data/electron_20/output_nt_Energy.csv",
+    "histogram"     : "./data/electron_300mev_20/output_h1_LayerTotal.csv",
+    "nTuple"        : "./data/electron_300mev_20/output_nt_Energy.csv",
 }
 
 NEUTRON_DATA = {
-    "histogram"     : "./data/neutron_20/output_h1_LayerTotal.csv",
-    "nTuple"        : "./data/neutron_20/output_nt_Energy.csv",
+    "histogram"     : "./data/neutron_300mev_20/output_h1_LayerTotal.csv",
+    "nTuple"        : "./data/neutron_300mev_20/output_nt_Energy.csv",
 }
 
 # Define simulation parameters
