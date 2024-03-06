@@ -1,5 +1,5 @@
 # Local
-GEANT4_myPath=/home/giorgio/.local/share/geant4-v11.2.0-install
+GEANT4_myPath=/home/giorgio/.local/share/geant4-v10.7.4-install
 source $GEANT4_myPath/bin/geant4.sh
 
 # CPlab
