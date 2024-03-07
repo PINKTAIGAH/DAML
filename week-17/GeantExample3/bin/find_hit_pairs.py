@@ -1,4 +1,4 @@
-
+??? from here until ???END lines may have been inserted/deleted
 import pandas as pd
 import numpy as np
 
@@ -8,25 +8,21 @@ TRACKER2_FILENAME   = "./data/output_nt_Tracker1.csv"
 TRUTH2_FILENAME     = "./data/output_nt_Truth.csv"
 NUM_EVENTS          = 1000
 
-def compute_hits(truth_df, tracker1_df, tracker2_df):
+def compute_hit_pairs(tracker1_df, tracker2_df):
     """
-    Compute the number of detector hits for all events simulated.
-    Ironically enough, we can use this same function to compute the number of MC particles in each event
+    Compute tracker hit pairs in events
     """
 
-    # Compute the multiplicity of event number for each detector part
-    num_hits_truth = truth_df["EventID"].value_counts()
-    num_hits_tracker1 = tracker1_df["EventID"].value_counts()
-    num_hits_tracker2 = tracker2_df["EventID"].value_counts()
+    # Empty list to contain tuples with idx of hit pairs
+    hit_pairs = [ [] for _ in range(tracker1_df.shape[0] ]
 
-    # Create dataframe containing all hit information & replace nan with 0
-    hit_df = pd.DataFrame(
-        {"Truth":num_hits_truth, "Tracker1":num_hits_tracker1, "Tracker2":num_hits_tracker2}
-    ).fillna(0.0)
 
-    # Replace float to int and return dataframe
+    # Loop through each event and find idx of hit pairs in tracker 1 and tracker 2
+    for event_idx in range(tracker1_df.shape[0]):
+        
+        print(tracker1_df.loc[['EventID' == event_idx]])
 
-    return hit_df.astype(int)
+
 
 
 # Read csv files
@@ -35,11 +31,35 @@ tracker1_df = pd.read_csv(TRACKER1_FILENAME, comment="#", names=["EventID", "Phi
 tracker2_df = pd.read_csv(TRACKER2_FILENAME, comment="#", names=["EventID", "Phi", "Theta"])
 
 # Compute hits
-hit_df = compute_hits(truth_df, tracker1_df, tracker2_df)
+hit_df = compute_hit_pairs(import pandas as pd
+import numpy as np
 
-# Print out hit info
-for idx in range(NUM_EVENTS):
-    # Exit printing loop if NUM_EVENTS was larger than dataframe size
-    if idx+1 > hit_df.shape[0]:
-        break
-    print(hit_df.iloc[idx], "\n")
+# Define global constants
+TRACKER1_FILENAME   = "./data/output_nt_Tracker1.csv"
+TRACKER2_FILENAME   = "./data/output_nt_Tracker1.csv"
+TRUTH2_FILENAME     = "./data/output_nt_Truth.csv"
+NUM_EVENTS          = 1000
+
+def compute_hit_pairs(tracker1_df, tracker2_df):
+    """ 
+    Compute tracker hit pairs in events
+    """
+
+    # Empty list to contain tuples with idx of hit pairs
+    hit_pairs = [ [] for _ in range(tracker1_df.shape[0] ]
+    
+
+    # Loop through each event and find idx of hit pairs in tracker 1 and tracker 2
+    for event_idx in range(tracker1_df.shape[0]):                          
+
+        print(tracker1_df.loc[['EventID' == event_idx]])
+
+
+
+
+# Read csv files
+truth_df = pd.read_csv(TRUTH2_FILENAME, comment="#", names=["EventID", "Phi", "Theta", "Momentum"])
+tracker1_df = pd.read_csv(TRACKER1_FILENAME, comment="#", names=["EventID", "Phi", "Theta"])
+tracker2_df = pd.read_csv(TRACKER2_FILENAME, comment="#", names=["EventID", "Phi",tracker1_df, tracker2_df)
+
+???END
