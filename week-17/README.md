@@ -40,3 +40,4 @@ To create the mass distibution plots, run the following command:
 python bin/plot_figures.py
 ```
 
+From the mass distribution, we see that the mean initial energy of the interaction inside the detector was centered at $\sim 90 GeV$, which coinsides with the rest mass of the Z-boson. Hence the interaction that was simulated was likely the decay of a Z boson via NC channel int a mu+mu-.
