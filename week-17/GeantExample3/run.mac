@@ -12,4 +12,4 @@
 #
 # Initialise physics
 #/run/setCut 10 m #low detail
-/run/beamOn 1000
+/run/beamOn 0
