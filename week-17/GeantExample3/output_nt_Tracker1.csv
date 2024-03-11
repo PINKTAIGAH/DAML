@@ -1,9 +1,0 @@
-#class tools::wcsv::ntuple
-#title Tracker 1 coordinates
-#separator 44
-#vector_separator 59
-#column int EventNumber
-#column double Phi
-#column double Theta
-0,-1.70382,2.21227
-0,1.45424,0.929303
